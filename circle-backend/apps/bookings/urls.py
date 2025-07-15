@@ -1,7 +1,8 @@
 from rest_framework.routers import DefaultRouter
-from .api import BookingViewSet
+from . import api
 
 router = DefaultRouter()
-router.register(r'bookings', BookingViewSet, basename='booking')
+# Когда создадим ViewSets, добавим их здесь
+# router.register(r'bookings', api.BookingViewSet, basename='booking')
 
 urlpatterns = router.urls

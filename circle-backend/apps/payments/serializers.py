@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import PaymentTransaction, AccountingTransaction
 from apps.agencies.models import TravelAgency
-from apps.users.models import User
+from apps.users.serializers import UserShortSerializer
 from apps.bookings.models import Booking
 
 
@@ -15,19 +15,10 @@ class SimpleAgencySerializer(serializers.ModelSerializer):
 
 
 ############################################
-# Simple User Serializer
-############################################
-class SimpleUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 'last_name']
-
-
-############################################
 # PaymentTransaction Serializer
 ############################################
 class PaymentTransactionSerializer(serializers.ModelSerializer):
-    user = SimpleUserSerializer(read_only=True)
+    user = UserShortSerializer(read_only=True)
     agency = SimpleAgencySerializer(read_only=True)
     booking = serializers.PrimaryKeyRelatedField(read_only=True)
 

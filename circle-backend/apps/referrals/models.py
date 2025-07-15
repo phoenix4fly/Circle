@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from apps.bookings.models import Booking
 
 
 class ReferralPartner(models.Model):
@@ -67,7 +66,7 @@ class ReferralBonus(models.Model):
         help_text="Кому начислен бонус"
     )
     booking = models.ForeignKey(
-        Booking,
+        'bookings.Booking',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

@@ -22,11 +22,24 @@ class Specialization(models.Model):
 
 
 class User(AbstractUser):
+    GENDER_CHOICES = [
+        ('M', 'Мужчина'),
+        ('F', 'Женщина'),
+        ('O', 'Предпочитаю не указывать'),
+    ]
+
     avatar = models.ImageField(
         upload_to="avatars/",
         blank=True,
         null=True,
         help_text="Фото профиля. Может быть загружено из Telegram или самим пользователем."
+    )
+    gender = models.CharField(
+        max_length=1,
+        choices=GENDER_CHOICES,
+        blank=True,
+        null=True,
+        help_text="Пол пользователя для персонализации контента и аналитики"
     )
     sphere = models.ForeignKey(
         Sphere,
@@ -73,9 +86,22 @@ class User(AbstractUser):
         "self",
         symmetrical=True,
         blank=True,
-        related_name="connected_to",
         help_text="Другие пользователи, с которыми установлено соединение."
     )
 
     def __str__(self):
         return self.username or f"User {self.telegram_id}"
+
+    def get_gender_display_short(self):
+        """Короткое отображение пола для UI"""
+        gender_map = {'M': '♂', 'F': '♀', 'O': '○'}
+        return gender_map.get(self.gender, '')
+
+    @property
+    def full_name(self):
+        """Полное имя для отображения"""
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        elif self.first_name:
+            return self.first_name
+        return self.username

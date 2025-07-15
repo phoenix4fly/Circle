@@ -17,7 +17,7 @@ class BookingAdmin(admin.ModelAdmin):
         "session",
         "status",
         "seats_reserved",
-        "final_price",
+        "final_price_paid",
         "promo_code",
         "approved_by",
         "approved_at",
@@ -52,7 +52,9 @@ class BookingAdmin(admin.ModelAdmin):
         'created_at',
         'approved_at',
         'expires_at',
-        'final_price'
+        'base_price',
+        'discount_amount',
+        'final_price_paid'
     )
 
     ordering = ['-created_at']
@@ -70,7 +72,10 @@ class BookingAdmin(admin.ModelAdmin):
                 'selected_transport',
                 'selected_accommodation',
                 'promo_code',
-                'final_price',
+                'base_price',
+                'discount_amount',
+                'bonus_used_amount',
+                'final_price_paid',
                 'comment',
             )
         }),

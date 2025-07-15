@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 from .models import SystemConfig, SystemLogEntry
-from apps.users.serializers import SimpleUserSerializer
+from apps.users.serializers import UserShortSerializer
 
 
 class SystemConfigSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class SystemConfigSerializer(serializers.ModelSerializer):
 
 
 class SystemLogEntrySerializer(serializers.ModelSerializer):
-    user = SimpleUserSerializer(read_only=True)
+    user = UserShortSerializer(read_only=True)
 
     class Meta:
         model = SystemLogEntry

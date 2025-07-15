@@ -3,7 +3,6 @@ from django.utils import timezone
 
 from apps.users.models import User
 from apps.tours.models import Tour, TourSession, PromoCode
-from apps.referrals.models import ReferralPartner
 
 
 class Booking(models.Model):
@@ -68,7 +67,7 @@ class Booking(models.Model):
     )
 
     referral_partner = models.ForeignKey(
-        ReferralPartner,
+        'referrals.ReferralPartner',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

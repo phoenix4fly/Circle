@@ -16,6 +16,15 @@ class SpecializationSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'sphere']
 
 
+class UserShortSerializer(serializers.ModelSerializer):
+    """Краткий сериализатор пользователя для списков и связей"""
+    full_name = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'full_name', 'avatar']
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     sphere = SphereSerializer(read_only=True)
     specialization = SpecializationSerializer(read_only=True)

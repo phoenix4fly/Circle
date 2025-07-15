@@ -1,17 +1,8 @@
-from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
-from .api import (
-    ReferralPartnerViewSet,
-    ReferralBonusViewSet,
-    WithdrawalRequestViewSet
-)
+from . import api
 
 router = DefaultRouter()
-router.register(r'partners', ReferralPartnerViewSet, basename='referral-partner')
-router.register(r'bonuses', ReferralBonusViewSet, basename='referral-bonus')
-router.register(r'withdrawals', WithdrawalRequestViewSet, basename='withdrawal-request')
+# Когда создадим ViewSets, добавим их здесь
+# router.register(r'partners', api.ReferralPartnerViewSet, basename='referral-partner')
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+urlpatterns = router.urls
