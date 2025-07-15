@@ -1,0 +1,22 @@
+Django>=4.2,<5.0
+djangorestframework
+djangorestframework-simplejwt
+django-filter
+psycopg2-binary
+Pillow
+django-cors-headers
+drf-yasg
+
+# Celery
+celery
+redis
+
+# Aiogram (если telegram bot живёт в том же проекте)
+aiogram
+
+# Для работы с env
+python-dotenv
+
+# Для удобства при разработке
+django-debug-toolbar
+
