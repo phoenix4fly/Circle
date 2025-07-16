@@ -24,10 +24,78 @@ export interface User {
     sphere: {
       id: number;
       name: string;
+      description: string;
     };
   };
+  preferred_activities?: ActivityType[];
+  preferred_destinations?: Destination[];
+  preferred_trip_formats?: TripFormat[];
+  preferred_travel_styles?: TravelStyle[];
+  preferred_travel_locations?: TravelLocation[];
+  preferred_trip_durations?: TripDuration[];
+  onboarding_completed: boolean;
+  sphere_selected: boolean;
+  preferences_selected: boolean;
   telegram_id?: number;
   last_online?: string;
+}
+
+// Новые типы для onboarding
+export interface Sphere {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface Specialization {
+  id: number;
+  name: string;
+  description: string;
+  sphere: Sphere;
+}
+
+export interface ActivityType {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface Destination {
+  id: number;
+  name: string;
+  description: string;
+  region: string;
+  icon: string;
+}
+
+export interface TripFormat {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+// Новые типы для обновленных предпочтений
+export interface TravelStyle {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface TravelLocation {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface TripDuration {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
 }
 
 export interface AuthTokens {
@@ -52,191 +120,223 @@ export interface RegisterData {
 }
 
 export interface LoginData {
-  login: string; // телефон или email
+  login: string;
   password: string;
+}
+
+export interface SphereSelectionData {
+  sphere: number;
+  specialization?: number;
+}
+
+export interface PreferencesSelectionData {
+  preferred_activities?: number[];
+  preferred_destinations?: number[];
+  preferred_trip_formats?: number[];
+  preferred_travel_styles?: number[];
+  preferred_travel_locations?: number[];
+  preferred_trip_durations?: number[];
 }
 
 // Утилиты для работы с токенами
 export const tokenUtils = {
   getTokens: (): AuthTokens | null => {
     if (typeof window === 'undefined') return null;
-    
-    const access = localStorage.getItem('circle_access_token');
-    const refresh = localStorage.getItem('circle_refresh_token');
-    
-    if (access && refresh) {
-      return { access, refresh };
-    }
-    return null;
+    const tokens = localStorage.getItem('circle_tokens');
+    return tokens ? JSON.parse(tokens) : null;
   },
 
-  setTokens: (tokens: AuthTokens) => {
+  setTokens: (tokens: AuthTokens): void => {
     if (typeof window === 'undefined') return;
-    
-    localStorage.setItem('circle_access_token', tokens.access);
-    localStorage.setItem('circle_refresh_token', tokens.refresh);
+    localStorage.setItem('circle_tokens', JSON.stringify(tokens));
   },
 
-  clearTokens: () => {
+  removeTokens: (): void => {
     if (typeof window === 'undefined') return;
-    
-    localStorage.removeItem('circle_access_token');
-    localStorage.removeItem('circle_refresh_token');
+    localStorage.removeItem('circle_tokens');
     localStorage.removeItem('circle_user');
   },
 
   getUser: (): User | null => {
     if (typeof window === 'undefined') return null;
-    
-    const userData = localStorage.getItem('circle_user');
-    return userData ? JSON.parse(userData) : null;
+    const user = localStorage.getItem('circle_user');
+    return user ? JSON.parse(user) : null;
   },
 
-  setUser: (user: User) => {
+  setUser: (user: User): void => {
     if (typeof window === 'undefined') return;
-    
     localStorage.setItem('circle_user', JSON.stringify(user));
   },
 
   isAuthenticated: (): boolean => {
-    const tokens = tokenUtils.getTokens();
-    return tokens !== null;
+    return !!tokenUtils.getTokens()?.access;
   }
 };
 
-// API клиент
-class ApiClient {
-  private baseURL: string;
-
-  constructor(baseURL: string) {
-    this.baseURL = baseURL;
-  }
-
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+// HTTP клиент с автоматическим добавлением токенов
+const httpClient = {
+  async request(url: string, options: RequestInit = {}) {
+    const tokens = tokenUtils.getTokens();
     
-    // Подготавливаем заголовки
-    const headers: any = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...(options.headers || {}),
+      ...(options.headers as Record<string, string>),
     };
 
-    // Добавляем токен авторизации если есть
-    const tokens = tokenUtils.getTokens();
-    if (tokens) {
+    if (tokens?.access) {
       headers.Authorization = `Bearer ${tokens.access}`;
     }
 
-    const config: RequestInit = {
-      ...options,
-      headers,
-    };
-
     try {
-      const response = await fetch(url, config);
+      const response = await fetch(`${API_BASE_URL}${url}`, {
+        ...options,
+        headers,
+      });
 
-      // Если токен истек, пробуем обновить
-      if (response.status === 401 && tokens) {
-        const newTokens = await this.refreshToken(tokens.refresh);
-        if (newTokens) {
-          // Повторяем запрос с новым токеном
+      // Если токен истек, попробуем обновить
+      if (response.status === 401 && tokens?.refresh) {
+        const refreshResponse = await fetch(`${API_BASE_URL}/users/token/refresh/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: tokens.refresh }),
+        });
+
+        if (refreshResponse.ok) {
+          const newTokens = await refreshResponse.json();
+          tokenUtils.setTokens(newTokens);
+          
+          // Повторяем оригинальный запрос с новым токеном
           headers.Authorization = `Bearer ${newTokens.access}`;
-          const retryResponse = await fetch(url, { ...config, headers });
-          
-          if (!retryResponse.ok) {
-            throw new Error(`HTTP ${retryResponse.status}: ${retryResponse.statusText}`);
-          }
-          
-          return retryResponse.json();
+          return fetch(`${API_BASE_URL}${url}`, { ...options, headers });
         } else {
-          // Не удалось обновить токен - выходим
-          tokenUtils.clearTokens();
+          // Refresh токен тоже невалиден, выходим
+          tokenUtils.removeTokens();
           window.location.href = '/auth';
           throw new Error('Authentication failed');
         }
       }
 
       if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorData}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      return response.json();
+      return response;
     } catch (error) {
-      console.error('API Request failed:', error);
+      console.error('HTTP request failed:', error);
       throw error;
     }
-  }
+  },
 
-  private async refreshToken(refreshToken: string): Promise<AuthTokens | null> {
-    try {
-      const response = await fetch(`${this.baseURL}/users/token/refresh/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
+  async get(url: string) {
+    const response = await this.request(url);
+    return response.json();
+  },
 
-      if (response.ok) {
-        const data = await response.json();
-        const newTokens = {
-          access: data.access,
-          refresh: refreshToken, // refresh токен остается тот же
-        };
-        tokenUtils.setTokens(newTokens);
-        return newTokens;
-      }
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-    }
-    
-    return null;
-  }
-
-  // Методы API
-  async register(data: RegisterData): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/users/register/', {
+  async post(url: string, data: any) {
+    const response = await this.request(url, {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return response.json();
+  },
+
+  async patch(url: string, data: any) {
+    const response = await this.request(url, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+
+  async put(url: string, data: any) {
+    const response = await this.request(url, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+
+  async delete(url: string) {
+    const response = await this.request(url, {
+      method: 'DELETE',
+    });
+    return response.status === 204 ? null : response.json();
   }
+};
+
+// API клиент
+export const apiClient = {
+  // Аутентификация
+  async register(data: RegisterData): Promise<AuthResponse> {
+    return httpClient.post('/users/register/', data);
+  },
 
   async login(data: LoginData): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/users/login/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
+    return httpClient.post('/users/login/', data);
+  },
 
-  async getProfile(): Promise<User> {
-    return this.request<User>('/users/me/');
-  }
+  async getMe(): Promise<User> {
+    return httpClient.get('/users/me/');
+  },
 
-  async getSpheres(): Promise<Array<{ id: number; name: string; description: string }>> {
-    return this.request<Array<{ id: number; name: string; description: string }>>('/users/spheres/');
-  }
+  // Onboarding
+  async getSpheres(): Promise<Sphere[]> {
+    const response = await httpClient.get('/users/spheres/');
+    return response.results;
+  },
 
-  async getSpecializations(): Promise<Array<{ 
-    id: number; 
-    name: string; 
-    description: string; 
-    sphere: { id: number; name: string } 
-  }>> {
-    return this.request<Array<{ 
-      id: number; 
-      name: string; 
-      description: string; 
-      sphere: { id: number; name: string } 
-    }>>('/users/specializations/');
-  }
-}
+  async getSpecializations(sphereId?: number): Promise<Specialization[]> {
+    const url = sphereId 
+      ? `/users/spheres/${sphereId}/specializations/`
+      : '/users/specializations/';
+    const response = await httpClient.get(url);
+    return sphereId ? response : response.results;
+  },
 
-// Экспортируем экземпляр API клиента
-export const apiClient = new ApiClient(API_BASE_URL);
+  async selectSphere(data: SphereSelectionData): Promise<{ message: string; user: User }> {
+    return httpClient.patch('/users/users/select_sphere/', data);
+  },
+
+  async getActivityTypes(): Promise<ActivityType[]> {
+    const response = await httpClient.get('/users/activity-types/');
+    return response.results;
+  },
+
+  async getDestinations(): Promise<Destination[]> {
+    const response = await httpClient.get('/users/destinations/');
+    return response.results;
+  },
+
+  async getTripFormats(): Promise<TripFormat[]> {
+    const response = await httpClient.get('/users/trip-formats/');
+    return response.results;
+  },
+
+  // Новые методы для обновленных предпочтений
+  async getTravelStyles(): Promise<TravelStyle[]> {
+    const response = await httpClient.get('/users/travel-styles/');
+    return response.results;
+  },
+
+  async getTravelLocations(): Promise<TravelLocation[]> {
+    const response = await httpClient.get('/users/travel-locations/');
+    return response.results;
+  },
+
+  async getTripDurations(): Promise<TripDuration[]> {
+    const response = await httpClient.get('/users/trip-durations/');
+    return response.results;
+  },
+
+  async selectPreferences(data: PreferencesSelectionData): Promise<{ 
+    message: string; 
+    user: User; 
+    onboarding_completed: boolean 
+  }> {
+    return httpClient.patch('/users/users/select_preferences/', data);
+  }
+};
 
 // Экспортируем типы ошибок
 export class ApiError extends Error {

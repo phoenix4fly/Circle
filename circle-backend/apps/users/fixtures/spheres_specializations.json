@@ -1,0 +1,942 @@
+[
+  {
+    "model": "users.sphere",
+    "pk": 1,
+    "fields": {
+      "name": "IT / Digital",
+      "description": "Информационные технологии и цифровые профессии",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 2,
+    "fields": {
+      "name": "Маркетинг и Реклама",
+      "description": "Продвижение, брендинг, коммуникации",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 3,
+    "fields": {
+      "name": "Финансы и Бизнес",
+      "description": "Экономика, предпринимательство, финансовые услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 4,
+    "fields": {
+      "name": "Медицина и Здравоохранение",
+      "description": "Лечение, диагностика, медицинские услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 5,
+    "fields": {
+      "name": "Образование",
+      "description": "Обучение, педагогика, академическая деятельность",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 6,
+    "fields": {
+      "name": "Юриспруденция",
+      "description": "Правовые услуги, юридическое консультирование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 7,
+    "fields": {
+      "name": "Искусство и Творчество",
+      "description": "Творческие профессии, арт-индустрия",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 8,
+    "fields": {
+      "name": "Туризм и Гостеприимство",
+      "description": "Путешествия, отельный бизнес, ресторанная сфера",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 9,
+    "fields": {
+      "name": "Услуги / Торговля / Городской стиль",
+      "description": "Сфера обслуживания, ритейл, городские услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 10,
+    "fields": {
+      "name": "Студент",
+      "description": "Обучение в учебных заведениях",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 11,
+    "fields": {
+      "name": "Фриланс / Самозанятые",
+      "description": "Независимая трудовая деятельность",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 12,
+    "fields": {
+      "name": "Другое",
+      "description": "Другие сферы деятельности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 1,
+    "fields": {
+      "sphere": 1,
+      "name": "Разработчик",
+      "description": "Frontend, Backend, Full-stack разработка",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 2,
+    "fields": {
+      "sphere": 1,
+      "name": "Дизайнер UX/UI",
+      "description": "Дизайн пользовательских интерфейсов",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 3,
+    "fields": {
+      "sphere": 1,
+      "name": "Тестировщик",
+      "description": "QA, тестирование программного обеспечения",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 4,
+    "fields": {
+      "sphere": 1,
+      "name": "Data-аналитик",
+      "description": "Анализ данных, бизнес-аналитика",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 5,
+    "fields": {
+      "sphere": 1,
+      "name": "Digital-маркетолог",
+      "description": "Цифровое продвижение, таргетинг",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 6,
+    "fields": {
+      "sphere": 1,
+      "name": "SEO/ASO специалист",
+      "description": "Поисковая оптимизация",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 7,
+    "fields": {
+      "sphere": 1,
+      "name": "Проджект-менеджер",
+      "description": "Управление IT-проектами",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 8,
+    "fields": {
+      "sphere": 1,
+      "name": "Фрилансер в IT",
+      "description": "Независимая работа в IT",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 9,
+    "fields": {
+      "sphere": 1,
+      "name": "Другое (в Digital)",
+      "description": "Другие IT специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 10,
+    "fields": {
+      "sphere": 2,
+      "name": "SMM-специалист",
+      "description": "Ведение социальных сетей",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 11,
+    "fields": {
+      "sphere": 2,
+      "name": "Копирайтер",
+      "description": "Создание рекламных и маркетинговых текстов",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 12,
+    "fields": {
+      "sphere": 2,
+      "name": "Маркетолог",
+      "description": "Стратегическое планирование и реализация маркетинга",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 13,
+    "fields": {
+      "sphere": 2,
+      "name": "Рекламщик",
+      "description": "Создание и размещение рекламы",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 14,
+    "fields": {
+      "sphere": 2,
+      "name": "PR-менеджер",
+      "description": "Связи с общественностью",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 15,
+    "fields": {
+      "sphere": 2,
+      "name": "Бренд-менеджер",
+      "description": "Управление брендом",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 16,
+    "fields": {
+      "sphere": 2,
+      "name": "Исследователь рынка",
+      "description": "Маркетинговые исследования",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 17,
+    "fields": {
+      "sphere": 2,
+      "name": "Другое (в маркетинге/рекламе)",
+      "description": "Другие маркетинговые специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 18,
+    "fields": {
+      "sphere": 3,
+      "name": "Банковский работник",
+      "description": "Сотрудник банковской сферы",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 19,
+    "fields": {
+      "sphere": 3,
+      "name": "Финансовый аналитик",
+      "description": "Анализ финансовых рынков и инвестиций",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 20,
+    "fields": {
+      "sphere": 3,
+      "name": "Бухгалтер",
+      "description": "Ведение бухгалтерского учета",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 21,
+    "fields": {
+      "sphere": 3,
+      "name": "Экономист",
+      "description": "Экономический анализ и планирование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 22,
+    "fields": {
+      "sphere": 3,
+      "name": "Предприниматель",
+      "description": "Собственный бизнес",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 23,
+    "fields": {
+      "sphere": 3,
+      "name": "Менеджер по продажам",
+      "description": "Управление продажами",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 24,
+    "fields": {
+      "sphere": 3,
+      "name": "Кредитный специалист",
+      "description": "Работа с кредитными продуктами",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 25,
+    "fields": {
+      "sphere": 3,
+      "name": "Логист/закупки",
+      "description": "Логистика и снабжение",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 26,
+    "fields": {
+      "sphere": 3,
+      "name": "Другое (в финансах/бизнесе)",
+      "description": "Другие финансовые специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 27,
+    "fields": {
+      "sphere": 4,
+      "name": "Врач",
+      "description": "Медицинская практика",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 28,
+    "fields": {
+      "sphere": 4,
+      "name": "Медсестра",
+      "description": "Медицинский уход",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 29,
+    "fields": {
+      "sphere": 4,
+      "name": "Стоматолог",
+      "description": "Стоматологическая практика",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 30,
+    "fields": {
+      "sphere": 4,
+      "name": "Фармацевт",
+      "description": "Фармацевтическая деятельность",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 31,
+    "fields": {
+      "sphere": 4,
+      "name": "Лаборант",
+      "description": "Лабораторная диагностика",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 32,
+    "fields": {
+      "sphere": 4,
+      "name": "Медицинский админ",
+      "description": "Административная работа в медицине",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 33,
+    "fields": {
+      "sphere": 4,
+      "name": "Студент-медик",
+      "description": "Изучение медицины",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 34,
+    "fields": {
+      "sphere": 4,
+      "name": "Другое (в медицине)",
+      "description": "Другие медицинские специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 35,
+    "fields": {
+      "sphere": 5,
+      "name": "Учитель",
+      "description": "Школьное образование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 36,
+    "fields": {
+      "sphere": 5,
+      "name": "Преподаватель вуза",
+      "description": "Высшее образование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 37,
+    "fields": {
+      "sphere": 5,
+      "name": "Репетитор",
+      "description": "Индивидуальное обучение",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 38,
+    "fields": {
+      "sphere": 5,
+      "name": "Педагог дошкольного образования",
+      "description": "Работа с детьми дошкольного возраста",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 39,
+    "fields": {
+      "sphere": 5,
+      "name": "Студент педвуза",
+      "description": "Изучение педагогики",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 40,
+    "fields": {
+      "sphere": 5,
+      "name": "Образовательный администратор",
+      "description": "Управление в образовании",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 41,
+    "fields": {
+      "sphere": 5,
+      "name": "Другое (в образовании)",
+      "description": "Другие образовательные специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 42,
+    "fields": {
+      "sphere": 6,
+      "name": "Юрист",
+      "description": "Юридическая практика",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 43,
+    "fields": {
+      "sphere": 6,
+      "name": "Адвокат",
+      "description": "Защита интересов в суде",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 44,
+    "fields": {
+      "sphere": 6,
+      "name": "Нотариус",
+      "description": "Нотариальные услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 45,
+    "fields": {
+      "sphere": 6,
+      "name": "Помощник юриста",
+      "description": "Помощь в юридической деятельности",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 46,
+    "fields": {
+      "sphere": 6,
+      "name": "Студент юридического факультета",
+      "description": "Изучение права",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 47,
+    "fields": {
+      "sphere": 6,
+      "name": "Другое (в юриспруденции)",
+      "description": "Другие юридические специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 48,
+    "fields": {
+      "sphere": 7,
+      "name": "Художник",
+      "description": "Изобразительное искусство",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 49,
+    "fields": {
+      "sphere": 7,
+      "name": "Фотограф",
+      "description": "Фотоискусство",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 50,
+    "fields": {
+      "sphere": 7,
+      "name": "Видеограф",
+      "description": "Видеопроизводство",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 51,
+    "fields": {
+      "sphere": 7,
+      "name": "Музыкант",
+      "description": "Музыкальное искусство",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 52,
+    "fields": {
+      "sphere": 7,
+      "name": "Актёр",
+      "description": "Театральное и киноискусство",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 53,
+    "fields": {
+      "sphere": 7,
+      "name": "Писатель",
+      "description": "Литературное творчество",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 54,
+    "fields": {
+      "sphere": 7,
+      "name": "Иллюстратор",
+      "description": "Создание иллюстраций",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 55,
+    "fields": {
+      "sphere": 7,
+      "name": "Архитектор",
+      "description": "Архитектурное проектирование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 56,
+    "fields": {
+      "sphere": 7,
+      "name": "Декоратор",
+      "description": "Декоративное оформление",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 57,
+    "fields": {
+      "sphere": 7,
+      "name": "Другое (в искусстве)",
+      "description": "Другие творческие специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 58,
+    "fields": {
+      "sphere": 8,
+      "name": "Гид",
+      "description": "Экскурсионное сопровождение",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 59,
+    "fields": {
+      "sphere": 8,
+      "name": "Туроператор",
+      "description": "Организация туристических поездок",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 60,
+    "fields": {
+      "sphere": 8,
+      "name": "Администратор гостиницы",
+      "description": "Гостиничное дело",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 61,
+    "fields": {
+      "sphere": 8,
+      "name": "Авиакомпания/поезд",
+      "description": "Транспортные услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 62,
+    "fields": {
+      "sphere": 8,
+      "name": "Повар",
+      "description": "Кулинарное искусство",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 63,
+    "fields": {
+      "sphere": 8,
+      "name": "Бармен",
+      "description": "Барменское дело",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 64,
+    "fields": {
+      "sphere": 8,
+      "name": "Другое (в туризме)",
+      "description": "Другие туристические специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 65,
+    "fields": {
+      "sphere": 9,
+      "name": "Бариста",
+      "description": "Приготовление кофе",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 66,
+    "fields": {
+      "sphere": 9,
+      "name": "Официант",
+      "description": "Ресторанное обслуживание",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 67,
+    "fields": {
+      "sphere": 9,
+      "name": "Продавец",
+      "description": "Розничная торговля",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 68,
+    "fields": {
+      "sphere": 9,
+      "name": "Курьер",
+      "description": "Доставка товаров и услуг",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 69,
+    "fields": {
+      "sphere": 9,
+      "name": "Парикмахер",
+      "description": "Парикмахерские услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 70,
+    "fields": {
+      "sphere": 9,
+      "name": "Стилист",
+      "description": "Стилистические услуги",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 71,
+    "fields": {
+      "sphere": 9,
+      "name": "Администратор",
+      "description": "Административное обслуживание",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 72,
+    "fields": {
+      "sphere": 9,
+      "name": "Другое (в услугах)",
+      "description": "Другие сервисные специальности",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 73,
+    "fields": {
+      "sphere": 10,
+      "name": "Студент вуза",
+      "description": "Высшее образование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 74,
+    "fields": {
+      "sphere": 10,
+      "name": "Колледж/техникум",
+      "description": "Среднее профессиональное образование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 75,
+    "fields": {
+      "sphere": 10,
+      "name": "Абитуриент",
+      "description": "Поступающий в учебное заведение",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 76,
+    "fields": {
+      "sphere": 10,
+      "name": "Другое (учусь)",
+      "description": "Другие формы обучения",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 77,
+    "fields": {
+      "sphere": 11,
+      "name": "Фриланс-дизайнер",
+      "description": "Независимый дизайнер",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 78,
+    "fields": {
+      "sphere": 11,
+      "name": "Фриланс-писатель",
+      "description": "Независимый автор",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 79,
+    "fields": {
+      "sphere": 11,
+      "name": "Фриланс-фотограф",
+      "description": "Независимый фотограф",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 80,
+    "fields": {
+      "sphere": 11,
+      "name": "Фриланс-разработчик",
+      "description": "Независимый программист",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 81,
+    "fields": {
+      "sphere": 11,
+      "name": "Другое (фриланс)",
+      "description": "Другие виды фриланса",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.specialization",
+    "pk": 82,
+    "fields": {
+      "sphere": 12,
+      "name": "Свой вариант",
+      "description": "Возможность ввести свою специальность",
+      "is_active": true
+    }
+  }
+] 

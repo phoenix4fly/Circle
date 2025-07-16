@@ -21,6 +21,55 @@ class Specialization(models.Model):
         return self.name
 
 
+# Новые модели для предпочтений путешествий
+class TravelStyle(models.Model):
+    """Стили отдыха"""
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, blank=True, help_text="Название иконки")
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = "Travel Style"
+        verbose_name_plural = "Travel Styles"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class TravelLocation(models.Model):
+    """Локации для путешествий"""
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, blank=True, help_text="Название иконки")
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = "Travel Location"
+        verbose_name_plural = "Travel Locations"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class TripDuration(models.Model):
+    """Форматы поездок по длительности"""
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, blank=True, help_text="Название иконки")
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = "Trip Duration"
+        verbose_name_plural = "Trip Durations"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser):
     GENDER_CHOICES = [
         ('M', 'Мужчина'),
@@ -78,7 +127,41 @@ class User(AbstractUser):
     last_online = models.DateTimeField(
         null=True,
         blank=True,
-        help_text="Время последней активности пользователя."
+        help_text="Время последней активности пользователя"
+    )
+    
+    # Новые поля для предпочтений путешествий
+    preferred_travel_styles = models.ManyToManyField(
+        TravelStyle,
+        blank=True,
+        related_name="users",
+        help_text="Предпочитаемые стили отдыха"
+    )
+    preferred_travel_locations = models.ManyToManyField(
+        TravelLocation,
+        blank=True,
+        related_name="users",
+        help_text="Предпочитаемые локации"
+    )
+    preferred_trip_durations = models.ManyToManyField(
+        TripDuration,
+        blank=True,
+        related_name="users",
+        help_text="Предпочитаемые форматы поездок"
+    )
+    
+    # Поля для отслеживания процесса onboarding
+    onboarding_completed = models.BooleanField(
+        default=False,
+        help_text="Завершен ли процесс первичной настройки профиля"
+    )
+    sphere_selected = models.BooleanField(
+        default=False,
+        help_text="Выбрана ли сфера деятельности"
+    )
+    preferences_selected = models.BooleanField(
+        default=False,
+        help_text="Выбраны ли предпочтения путешествий"
     )
 
     # Connections / Friends
@@ -86,11 +169,11 @@ class User(AbstractUser):
         "self",
         symmetrical=True,
         blank=True,
-        help_text="Другие пользователи, с которыми установлено соединение."
+        help_text="Пользователи, с которыми этот пользователь связан (через совместные поездки)"
     )
 
     def __str__(self):
-        return self.username or f"User {self.telegram_id}"
+        return self.full_name or self.username
 
     def get_gender_display_short(self):
         """Короткое отображение пола для UI"""
@@ -99,9 +182,9 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        """Полное имя для отображения"""
-        if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        elif self.first_name:
-            return self.first_name
-        return self.username
+        """Полное имя пользователя"""
+        return f"{self.first_name} {self.last_name}".strip() or self.username
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"

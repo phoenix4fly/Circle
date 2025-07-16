@@ -51,8 +51,18 @@ export default function AuthPage() {
       tokenUtils.setTokens(response.tokens);
       tokenUtils.setUser(response.user);
       
-      // Перенаправляем на главную страницу
-      router.push('/');
+      // Проверяем статус onboarding и перенаправляем соответственно
+      if (!response.user.onboarding_completed) {
+        if (!response.user.sphere_selected) {
+          router.push('/onboarding/sphere');
+        } else if (!response.user.preferences_selected) {
+          router.push('/onboarding/preferences');
+        } else {
+          router.push('/');
+        }
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       console.error('Ошибка входа:', err);
       if (err.message.includes('Network Error') || err.message.includes('fetch')) {
@@ -106,8 +116,8 @@ export default function AuthPage() {
       tokenUtils.setTokens(response.tokens);
       tokenUtils.setUser(response.user);
       
-      // Перенаправляем на главную страницу
-      router.push('/');
+      // Для новых пользователей всегда идем на onboarding
+      router.push('/onboarding/sphere');
     } catch (err: any) {
       console.error('Ошибка регистрации:', err);
       if (err.message.includes('Network Error') || err.message.includes('fetch')) {

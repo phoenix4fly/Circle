@@ -7,15 +7,20 @@ router = DefaultRouter()
 router.register(r'users', api.UserViewSet, basename='user')
 router.register(r'spheres', api.SphereViewSet, basename='sphere')
 router.register(r'specializations', api.SpecializationViewSet, basename='specialization')
+router.register(r'travel-styles', api.TravelStyleViewSet, basename='travelstyle')
+router.register(r'travel-locations', api.TravelLocationViewSet, basename='travellocation')
+router.register(r'trip-durations', api.TripDurationViewSet, basename='tripduration')
 
 urlpatterns = [
-    path('telegram-register/', views.TelegramRegisterView.as_view(), name='telegram-register'),
-    
-    # Веб авторизация
+    # JWT Authentication
     path('register/', views.UserRegisterView.as_view(), name='user-register'),
     path('login/', views.UserLoginView.as_view(), name='user-login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
-    
-    # Профиль
     path('me/', views.UserMeView.as_view(), name='user-me'),
-] + router.urls
+    
+    # Telegram
+    path('telegram-register/', views.TelegramRegisterView.as_view(), name='telegram-register'),
+    
+    # API Router
+    path('', include(router.urls)),
+]

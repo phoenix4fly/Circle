@@ -1,0 +1,294 @@
+[
+  {
+    "model": "users.travelstyle",
+    "pk": 1,
+    "fields": {
+      "name": "Активный",
+      "description": "Движение, энергия, приключения",
+      "icon": "energy",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 2,
+    "fields": {
+      "name": "Расслабленный",
+      "description": "Тишина, медленный ритм",
+      "icon": "relax",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 3,
+    "fields": {
+      "name": "Сбалансированный",
+      "description": "Немного активности, немного отдыха",
+      "icon": "balance",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 4,
+    "fields": {
+      "name": "Спонтанный",
+      "description": "Люблю неожиданные планы",
+      "icon": "spontaneous",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 5,
+    "fields": {
+      "name": "Осознанный",
+      "description": "Природа, перезагрузка, быть здесь и сейчас",
+      "icon": "mindful",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 6,
+    "fields": {
+      "name": "Общительный",
+      "description": "Новые знакомства, весёлая компания",
+      "icon": "social",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 7,
+    "fields": {
+      "name": "Уединённый",
+      "description": "Только я и мир вокруг",
+      "icon": "solitude",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 8,
+    "fields": {
+      "name": "Семейный",
+      "description": "Подходит для всей семьи",
+      "icon": "family",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travelstyle",
+    "pk": 9,
+    "fields": {
+      "name": "Экстрим",
+      "description": "Для любителей острых ощущений",
+      "icon": "extreme",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.travellocation",
+    "pk": 1,
+    "fields": {
+      "name": "Горы",
+      "description": "Горные пейзажи и вершины",
+      "icon": "mountains",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 2,
+    "fields": {
+      "name": "Каньоны",
+      "description": "Величественные каньоны и ущелья",
+      "icon": "canyon",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 3,
+    "fields": {
+      "name": "Пустыня",
+      "description": "Бескрайние пустынные просторы",
+      "icon": "desert",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 4,
+    "fields": {
+      "name": "Лес и природа",
+      "description": "Зелёные леса и природные заповедники",
+      "icon": "forest",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 5,
+    "fields": {
+      "name": "Озёра и реки",
+      "description": "Водные пространства и береговые зоны",
+      "icon": "water",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 6,
+    "fields": {
+      "name": "Исторические города",
+      "description": "Города с богатой историей",
+      "icon": "historic_city",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 7,
+    "fields": {
+      "name": "Древние места",
+      "description": "Археологические памятники и древние сооружения",
+      "icon": "ancient",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 8,
+    "fields": {
+      "name": "Урбан-выезды",
+      "description": "Современные города и урбанистика",
+      "icon": "urban",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 9,
+    "fields": {
+      "name": "Аул, деревня",
+      "description": "Сельская местность и традиционный быт",
+      "icon": "village",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 10,
+    "fields": {
+      "name": "Побережье, пляж",
+      "description": "Берега водоёмов и пляжный отдых",
+      "icon": "beach",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.travellocation",
+    "pk": 11,
+    "fields": {
+      "name": "Национальные парки",
+      "description": "Охраняемые природные территории",
+      "icon": "national_park",
+      "is_active": true
+    }
+  },
+
+  {
+    "model": "users.tripduration",
+    "pk": 1,
+    "fields": {
+      "name": "1 день",
+      "description": "Однодневные поездки",
+      "icon": "one_day",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 2,
+    "fields": {
+      "name": "Выходные (2–3 дня)",
+      "description": "Поездки на выходные",
+      "icon": "weekend",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 3,
+    "fields": {
+      "name": "Длиннее 4 дней",
+      "description": "Продолжительные путешествия",
+      "icon": "long_trip",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 4,
+    "fields": {
+      "name": "Спонтанные выезды",
+      "description": "Внезапные поездки без планирования",
+      "icon": "spontaneous_trip",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 5,
+    "fields": {
+      "name": "Утренний/вечерний тур",
+      "description": "Короткие туры в определённое время",
+      "icon": "time_tour",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 6,
+    "fields": {
+      "name": "Ночёвка в палатке",
+      "description": "Походы с ночёвкой на природе",
+      "icon": "camping",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 7,
+    "fields": {
+      "name": "С комфортом (гостевые дома)",
+      "description": "Комфортное размещение в гостевых домах",
+      "icon": "comfort",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 8,
+    "fields": {
+      "name": "Автобус/авто-тур",
+      "description": "Поездки на транспорте",
+      "icon": "bus_tour",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.tripduration",
+    "pk": 9,
+    "fields": {
+      "name": "Пеший/хайкинг",
+      "description": "Пешие походы и треккинг",
+      "icon": "hiking",
+      "is_active": true
+    }
+  }
+] 

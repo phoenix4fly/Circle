@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
-from .models import User, Sphere, Specialization
+from .models import (
+    User, Sphere, Specialization, 
+    TravelStyle, TravelLocation, TripDuration
+)
 
 
 class SphereSerializer(serializers.ModelSerializer):
@@ -18,6 +21,25 @@ class SpecializationSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'sphere']
 
 
+# Новые сериализаторы для предпочтений
+class TravelStyleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelStyle
+        fields = ['id', 'name', 'description', 'icon']
+
+
+class TravelLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelLocation
+        fields = ['id', 'name', 'description', 'icon']
+
+
+class TripDurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TripDuration
+        fields = ['id', 'name', 'description', 'icon']
+
+
 class UserShortSerializer(serializers.ModelSerializer):
     """Краткий сериализатор пользователя для списков и связей"""
     full_name = serializers.ReadOnlyField()
@@ -30,6 +52,9 @@ class UserShortSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     sphere = SphereSerializer(read_only=True)
     specialization = SpecializationSerializer(read_only=True)
+    preferred_travel_styles = TravelStyleSerializer(many=True, read_only=True)
+    preferred_travel_locations = TravelLocationSerializer(many=True, read_only=True)
+    preferred_trip_durations = TripDurationSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -46,6 +71,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'specialization',
             'telegram_id',
             'last_online',
+            'preferred_travel_styles',
+            'preferred_travel_locations', 
+            'preferred_trip_durations',
+            'onboarding_completed',
+            'sphere_selected',
+            'preferences_selected',
         ]
 
 
@@ -68,6 +99,63 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("Username не может быть пустым.")
         return value
+
+
+# Новые сериализаторы для onboarding процесса
+class SphereSelectionSerializer(serializers.ModelSerializer):
+    """Сериализатор для выбора сферы деятельности"""
+    class Meta:
+        model = User
+        fields = ['sphere', 'specialization']
+    
+    def update(self, instance, validated_data):
+        instance.sphere = validated_data.get('sphere', instance.sphere)
+        instance.specialization = validated_data.get('specialization', instance.specialization)
+        instance.sphere_selected = True
+        instance.save()
+        return instance
+
+
+class PreferencesSelectionSerializer(serializers.ModelSerializer):
+    """Сериализатор для выбора предпочтений путешествий"""
+    preferred_travel_styles = serializers.PrimaryKeyRelatedField(
+        many=True, 
+        queryset=TravelStyle.objects.filter(is_active=True),
+        required=False
+    )
+    preferred_travel_locations = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=TravelLocation.objects.filter(is_active=True),
+        required=False
+    )
+    preferred_trip_durations = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=TripDuration.objects.filter(is_active=True),
+        required=False
+    )
+    
+    class Meta:
+        model = User
+        fields = ['preferred_travel_styles', 'preferred_travel_locations', 'preferred_trip_durations']
+    
+    def update(self, instance, validated_data):
+        # Обновляем предпочтения
+        if 'preferred_travel_styles' in validated_data:
+            instance.preferred_travel_styles.set(validated_data['preferred_travel_styles'])
+        if 'preferred_travel_locations' in validated_data:
+            instance.preferred_travel_locations.set(validated_data['preferred_travel_locations'])
+        if 'preferred_trip_durations' in validated_data:
+            instance.preferred_trip_durations.set(validated_data['preferred_trip_durations'])
+        
+        # Помечаем что предпочтения выбраны
+        instance.preferences_selected = True
+        
+        # Если выбраны и сфера, и предпочтения - завершаем onboarding
+        if instance.sphere_selected and instance.preferences_selected:
+            instance.onboarding_completed = True
+            
+        instance.save()
+        return instance
 
 
 class TelegramRegisterSerializer(serializers.Serializer):
@@ -102,64 +190,70 @@ class TelegramRegisterSerializer(serializers.Serializer):
         )
 
         if not created:
-            # обновляем существующего
-            if username:
-                user.username = username
-            if first_name:
-                user.first_name = first_name
-            if last_name:
-                user.last_name = last_name
+            # Пользователь уже существует, обновим данные
+            user.username = username or user.username
+            user.first_name = first_name or user.first_name
+            user.last_name = last_name or user.last_name
             user.save()
 
         return user
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для регистрации пользователей через веб-интерфейс
-    """
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password_confirm = serializers.CharField(write_only=True)
-    
+
     class Meta:
         model = User
         fields = [
-            'username', 'first_name', 'last_name', 
-            'email', 'phone_number', 'password', 'password_confirm'
+            'username',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'email',
+            'password',
+            'password_confirm'
         ]
-        extra_kwargs = {
-            'email': {'required': False, 'allow_blank': True},
-            'phone_number': {'required': True},
-        }
-    
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password_confirm']:
-            raise serializers.ValidationError("Пароли не совпадают")
-        return attrs
-    
+
     def validate_phone_number(self, value):
-        if not value:
-            raise serializers.ValidationError("Номер телефона обязателен")
+        """Валидация номера телефона для Узбекистана"""
+        import re
         
-        # Удаляем все кроме цифр
-        phone_digits = ''.join(filter(str.isdigit, value))
+        # Убираем все пробелы и символы
+        clean_phone = re.sub(r'[^\d+]', '', value)
         
-        # Проверяем узбекский формат
-        if not phone_digits.startswith('998') or len(phone_digits) != 12:
-            raise serializers.ValidationError("Введите корректный номер телефона в формате +998XXXXXXXXX")
+        # Проверяем формат +998XXXXXXXXX
+        if not re.match(r'^\+998\d{9}$', clean_phone):
+            raise serializers.ValidationError(
+                "Номер телефона должен быть в формате +998XXXXXXXXX"
+            )
         
         # Проверяем уникальность
-        if User.objects.filter(phone_number=value).exists():
-            raise serializers.ValidationError("Пользователь с таким номером уже существует")
+        if User.objects.filter(phone_number=clean_phone).exists():
+            raise serializers.ValidationError(
+                "Пользователь с таким номером уже существует"
+            )
         
-        return value
-    
+        return clean_phone
+
     def validate_username(self, value):
+        """Валидация имени пользователя"""
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Пользователь с таким именем уже существует")
+            raise serializers.ValidationError(
+                "Пользователь с таким именем уже существует"
+            )
         return value
-    
+
+    def validate(self, attrs):
+        """Общая валидация данных"""
+        if attrs['password'] != attrs['password_confirm']:
+            raise serializers.ValidationError({
+                'password_confirm': 'Пароли не совпадают'
+            })
+        return attrs
+
     def create(self, validated_data):
+        """Создание нового пользователя"""
         validated_data.pop('password_confirm')
         password = validated_data.pop('password')
         
@@ -171,48 +265,46 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    """
-    Сериализатор для входа пользователей (телефон или email + пароль)
-    """
-    login = serializers.CharField(
-        help_text="Телефон (+998XXXXXXXXX) или Email"
-    )
-    password = serializers.CharField(write_only=True)
-    
+    login = serializers.CharField()
+    password = serializers.CharField()
+
     def validate(self, attrs):
         login = attrs.get('login')
         password = attrs.get('password')
-        
-        if not login or not password:
-            raise serializers.ValidationError("Введите логин и пароль")
-        
-        # Попробуем найти пользователя по телефону или email
-        user = None
-        
-        # Если выглядит как телефон
-        if login.startswith('+998') or login.startswith('998'):
-            phone_digits = ''.join(filter(str.isdigit, login))
-            if len(phone_digits) == 12 and phone_digits.startswith('998'):
-                formatted_phone = f"+{phone_digits}"
-                user = User.objects.filter(phone_number=formatted_phone).first()
-        
-        # Если не нашли по телефону, пробуем по email
-        if not user and '@' in login:
-            user = User.objects.filter(email=login).first()
-        
-        # Если не нашли по email, пробуем по username
-        if not user:
-            user = User.objects.filter(username=login).first()
-        
-        if not user:
-            raise serializers.ValidationError("Пользователь не найден")
-        
-        # Проверяем пароль
-        if not user.check_password(password):
-            raise serializers.ValidationError("Неверный пароль")
-        
-        if not user.is_active:
-            raise serializers.ValidationError("Аккаунт заблокирован")
-        
-        attrs['user'] = user
+
+        if login and password:
+            # Попробуем найти пользователя по номеру телефона, email или username
+            user = None
+            
+            # Сначала по номеру телефона
+            if login.startswith('+998'):
+                try:
+                    user = User.objects.get(phone_number=login)
+                except User.DoesNotExist:
+                    pass
+            
+            # Потом по email
+            if not user and '@' in login:
+                try:
+                    user = User.objects.get(email=login)
+                except User.DoesNotExist:
+                    pass
+            
+            # И наконец по username
+            if not user:
+                try:
+                    user = User.objects.get(username=login)
+                except User.DoesNotExist:
+                    pass
+
+            if not user:
+                raise serializers.ValidationError('Пользователь не найден')
+
+            if not user.check_password(password):
+                raise serializers.ValidationError('Неверный пароль')
+
+            attrs['user'] = user
+        else:
+            raise serializers.ValidationError('Необходимо указать логин и пароль')
+
         return attrs
