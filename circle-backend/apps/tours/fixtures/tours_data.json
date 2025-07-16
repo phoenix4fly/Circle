@@ -1,0 +1,95 @@
+[
+  {
+    "model": "tours.tourcategory",
+    "pk": 1,
+    "fields": {
+      "name": "Природа и экология",
+      "description": "Национальные парки, озера, горы, заповедники",
+      "is_active": true
+    }
+  },
+  {
+    "model": "tours.tourcategory",
+    "pk": 2,
+    "fields": {
+      "name": "Экстрим и активный отдых",
+      "description": "Хайкинг, альпинизм, рафтинг, велотуры",
+      "is_active": true
+    }
+  },
+  {
+    "model": "tours.tourcategory",
+    "pk": 3,
+    "fields": {
+      "name": "Культурное наследие",
+      "description": "Исторические города, музеи, архитектура",
+      "is_active": true
+    }
+  },
+  {
+    "model": "tours.tourcategory",
+    "pk": 4,
+    "fields": {
+      "name": "Гастрономические туры",
+      "description": "Дегустации, кулинарные мастер-классы",
+      "is_active": true
+    }
+  },
+  {
+    "model": "tours.tourcategory",
+    "pk": 5,
+    "fields": {
+      "name": "Релакс и оздоровление",
+      "description": "СПА, санатории, термальные источники",
+      "is_active": true
+    }
+  },
+  {
+    "model": "tours.tourparameterdefinition",
+    "pk": 1,
+    "fields": {
+      "tour_type": 2,
+      "name": "Уровень сложности",
+      "unit": "",
+      "data_type": "enum",
+      "required": true,
+      "options": ["Легкий", "Средний", "Сложный", "Экстремальный"]
+    }
+  },
+  {
+    "model": "tours.tourparameterdefinition",
+    "pk": 2,
+    "fields": {
+      "tour_type": 1,
+      "name": "Высота над уровнем моря",
+      "unit": "м",
+      "data_type": "integer",
+      "required": false,
+      "options": null
+    }
+  },
+  {
+    "model": "tours.tourparameterdefinition",
+    "pk": 3,
+    "fields": {
+      "tour_type": 3,
+      "name": "Исторический период",
+      "unit": "",
+      "data_type": "enum",
+      "required": false,
+      "options": ["Античность", "Средневековье", "Советский период", "Современность"]
+    }
+  },
+  {
+    "model": "tours.tourparameterdefinition",
+    "pk": 4,
+    "fields": {
+      "tour_type": 2,
+      "name": "Протяженность маршрута",
+      "unit": "км",
+      "data_type": "float",
+      "required": true,
+      "options": null
+    }
+  }
+] 

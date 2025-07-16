@@ -1,0 +1,62 @@
+[
+  {
+    "model": "agencies.travelagency",
+    "pk": 1,
+    "fields": {
+      "name": "Uzbekistan Adventures",
+      "description": "Ведущее агентство активного туризма в Узбекистане. Специализируемся на горных походах, экстремальных турах и эко-путешествиях.",
+      "contact_person": "Дилшод Мирзаев",
+      "phone_number": "+998712501234",
+      "email": "info@uzadventures.uz",
+      "address": "г. Ташкент, ул. Амира Темура, 15",
+      "logo": "",
+      "is_active": true,
+      "commission_percent": 8.5,
+      "payme_merchant_id": "merchant_uzadventures_001",
+      "created_at": "2024-01-15T09:00:00Z",
+      "updated_at": "2024-12-15T10:30:00Z",
+      "average_rating": 4.8,
+      "total_reviews": 127
+    }
+  },
+  {
+    "model": "agencies.travelagency",
+    "pk": 2,
+    "fields": {
+      "name": "Silk Road Heritage",
+      "description": "Культурно-исторические туры по Великому Шелковому пути. Самарканд, Бухара, Хива - откройте древнюю историю Узбекистана.",
+      "contact_person": "Севара Усманова",
+      "phone_number": "+998662234567",
+      "email": "tours@silkroad.uz",
+      "address": "г. Самарканд, ул. Регистан, 3",
+      "logo": "",
+      "is_active": true,
+      "commission_percent": 7.0,
+      "payme_merchant_id": "merchant_silkroad_002",
+      "created_at": "2023-06-20T14:20:00Z",
+      "updated_at": "2024-12-10T16:45:00Z",
+      "average_rating": 4.9,
+      "total_reviews": 89
+    }
+  },
+  {
+    "model": "agencies.travelagency",
+    "pk": 3,
+    "fields": {
+      "name": "Aral Eco Tours",
+      "description": "Экологические туры и поездки к Аральскому морю. Уникальные маршруты по Каракалпакстану и пустыне Кызылкум.",
+      "contact_person": "Бахтияр Нуриддинов",
+      "phone_number": "+998613345678",
+      "email": "eco@araltours.uz",
+      "address": "г. Нукус, ул. Каракалпакстан, 8",
+      "logo": "",
+      "is_active": true,
+      "commission_percent": 9.0,
+      "payme_merchant_id": "merchant_aral_003",
+      "created_at": "2023-11-10T11:15:00Z",
+      "updated_at": "2024-12-12T09:20:00Z",
+      "average_rating": 4.6,
+      "total_reviews": 34
+    }
+  }
+] 

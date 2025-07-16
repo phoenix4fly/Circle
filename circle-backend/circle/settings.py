@@ -169,11 +169,28 @@ SIMPLE_JWT = {
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Next.js dev server
-    "http://127.0.0.1:3000",
+    "http://localhost:3000",    # Next.js dev server
+    "http://127.0.0.1:3000",   # Alternative localhost
+    "https://web.telegram.org", # Telegram WebApp
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Allow all origins in development
+CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
+
+# CORS headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')

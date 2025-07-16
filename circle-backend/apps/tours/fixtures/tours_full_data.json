@@ -1,0 +1,334 @@
+[
+  {
+    "model": "tours.tour",
+    "pk": 1,
+    "fields": {
+      "title": "Восхождение на пик Чимган",
+      "slug": "chimgan-peak-hiking",
+      "agency": 1,
+      "description": "Незабываемое восхождение на высочайшую точку Чимганских гор (3309м). Маршрут подойдет как новичкам, так и опытным туристам. Потрясающие виды на Ташкентскую область и соседние хребты.",
+      "type": 2,
+      "price_from": 450000,
+      "base_price": 450000,
+      "distance_from_tashkent_km": 80,
+      "duration_days": 2,
+      "duration_nights": 1,
+      "transport_options": {
+        "bus": 50000,
+        "car": 80000,
+        "minivan": 120000
+      },
+      "main_image": "",
+      "is_active": true,
+      "season_start": "2024-04-01",
+      "season_end": "2024-10-31",
+      "created_at": "2024-02-15T10:30:00Z",
+      "updated_at": "2024-12-10T14:20:00Z"
+    }
+  },
+  {
+    "model": "tours.tour",
+    "pk": 2,
+    "fields": {
+      "title": "Жемчужины Самарканда",
+      "slug": "samarkand-heritage-tour",
+      "agency": 2,
+      "description": "Исследуйте архитектурные шедевры Самарканда: Регистан, мавзолей Гур-Эмир, обсерватория Улугбека. Погрузитесь в историю Великого Шелкового пути и эпохи Тимуридов.",
+      "type": 3,
+      "price_from": 320000,
+      "base_price": 320000,
+      "distance_from_tashkent_km": 300,
+      "duration_days": 3,
+      "duration_nights": 2,
+      "transport_options": {
+        "train": 180000,
+        "bus": 120000,
+        "car": 250000
+      },
+      "main_image": "",
+      "is_active": true,
+      "season_start": null,
+      "season_end": null,
+      "created_at": "2024-01-20T09:15:00Z",
+      "updated_at": "2024-12-05T11:45:00Z"
+    }
+  },
+  {
+    "model": "tours.tour",
+    "pk": 3,
+    "fields": {
+      "title": "Озеро Айдаркуль и юртовый лагерь",
+      "slug": "aydarkul-lake-camp",
+      "agency": 3,
+      "description": "Уникальная возможность провести ночь в традиционной юрте на берегу рукотворного озера Айдаркуль. Рыбалка, верблюжьи прогулки, звездное небо пустыни.",
+      "type": 1,
+      "price_from": 550000,
+      "base_price": 550000,
+      "distance_from_tashkent_km": 350,
+      "duration_days": 2,
+      "duration_nights": 1,
+      "transport_options": {
+        "suv": 200000,
+        "minivan": 150000
+      },
+      "main_image": "",
+      "is_active": true,
+      "season_start": "2024-03-15",
+      "season_end": "2024-11-15",
+      "created_at": "2024-03-01T12:00:00Z",
+      "updated_at": "2024-12-01T16:30:00Z"
+    }
+  },
+  {
+    "model": "tours.tour",
+    "pk": 4,
+    "fields": {
+      "title": "Гастрономический тур по Бухаре",
+      "slug": "bukhara-food-tour",
+      "agency": 2,
+      "description": "Откройте для себя кулинарные традиции Бухары! Мастер-классы по приготовлению плова, дегустация в чайханах, посещение рынков и знакомство с местными поварами.",
+      "type": 4,
+      "price_from": 280000,
+      "base_price": 280000,
+      "distance_from_tashkent_km": 280,
+      "duration_days": 2,
+      "duration_nights": 1,
+      "transport_options": {
+        "train": 160000,
+        "bus": 100000
+      },
+      "main_image": "",
+      "is_active": true,
+      "season_start": null,
+      "season_end": null,
+      "created_at": "2024-02-28T14:45:00Z",
+      "updated_at": "2024-11-20T10:15:00Z"
+    }
+  },
+  {
+    "model": "tours.tour",
+    "pk": 5,
+    "fields": {
+      "title": "Треккинг в Угам-Чаткальском парке",
+      "slug": "ugam-chatkal-trekking",
+      "agency": 1,
+      "description": "Многодневный поход по заповедным тропам Угам-Чаткальского национального парка. Водопады, горные реки, альпийские луга и встречи с дикой природой.",
+      "type": 2,
+      "price_from": 680000,
+      "base_price": 680000,
+      "distance_from_tashkent_km": 120,
+      "duration_days": 4,
+      "duration_nights": 3,
+      "transport_options": {
+        "suv": 120000,
+        "minivan": 100000
+      },
+      "main_image": "",
+      "is_active": true,
+      "season_start": "2024-05-01",
+      "season_end": "2024-09-30",
+      "created_at": "2024-03-10T08:30:00Z",
+      "updated_at": "2024-12-08T13:20:00Z"
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 1,
+    "fields": {
+      "tour": 1,
+      "date_start": "2024-12-28",
+      "date_end": "2024-12-29",
+      "capacity": 12,
+      "available_seats": 8,
+      "is_active": true,
+      "price_override": null
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 2,
+    "fields": {
+      "tour": 1,
+      "date_start": "2025-01-04",
+      "date_end": "2025-01-05",
+      "capacity": 12,
+      "available_seats": 12,
+      "is_active": true,
+      "price_override": null
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 3,
+    "fields": {
+      "tour": 2,
+      "date_start": "2024-12-30",
+      "date_end": "2025-01-01",
+      "capacity": 15,
+      "available_seats": 6,
+      "is_active": true,
+      "price_override": 350000
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 4,
+    "fields": {
+      "tour": 2,
+      "date_start": "2025-01-15",
+      "date_end": "2025-01-17",
+      "capacity": 15,
+      "available_seats": 13,
+      "is_active": true,
+      "price_override": null
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 5,
+    "fields": {
+      "tour": 3,
+      "date_start": "2025-01-11",
+      "date_end": "2025-01-12",
+      "capacity": 8,
+      "available_seats": 5,
+      "is_active": true,
+      "price_override": null
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 6,
+    "fields": {
+      "tour": 4,
+      "date_start": "2025-01-18",
+      "date_end": "2025-01-19",
+      "capacity": 10,
+      "available_seats": 10,
+      "is_active": true,
+      "price_override": null
+    }
+  },
+  {
+    "model": "tours.toursession",
+    "pk": 7,
+    "fields": {
+      "tour": 5,
+      "date_start": "2025-02-01",
+      "date_end": "2025-02-04",
+      "capacity": 6,
+      "available_seats": 4,
+      "is_active": true,
+      "price_override": 750000
+    }
+  },
+  {
+    "model": "tours.tourschedule",
+    "pk": 1,
+    "fields": {
+      "tour": 1,
+      "day_number": 1,
+      "title": "Подъем на Чимган",
+      "description": "07:00 - Выезд из Ташкента. 09:30 - Прибытие в Чимган, завтрак. 11:00 - Начало восхождения через лес и альпийские луга. 15:00 - Обед на природе. 18:00 - Достижение вершины, панорамные виды. 20:00 - Спуск к базовому лагерю, ужин у костра.",
+      "image": ""
+    }
+  },
+  {
+    "model": "tours.tourschedule",
+    "pk": 2,
+    "fields": {
+      "tour": 1,
+      "day_number": 2,
+      "title": "Возвращение в город",
+      "description": "08:00 - Завтрак на природе. 09:30 - Сбор лагеря, финальные фото. 11:00 - Выезд в Ташкент с остановками на смотровых площадках. 14:00 - Обед в кафе. 16:30 - Прибытие в Ташкент.",
+      "image": ""
+    }
+  },
+  {
+    "model": "tours.tourschedule",
+    "pk": 3,
+    "fields": {
+      "tour": 2,
+      "day_number": 1,
+      "title": "Площадь Регистан",
+      "description": "09:00 - Встреча с гидом, завтрак. 10:00 - Экскурсия по площади Регистан: медресе Улугбека, Шер-Дор и Тилля-Кари. 13:00 - Обед в национальном ресторане. 15:00 - Посещение мавзолея Гур-Эмир. 18:00 - Свободное время, ужин.",
+      "image": ""
+    }
+  },
+  {
+    "model": "tours.tourschedule",
+    "pk": 4,
+    "fields": {
+      "tour": 2,
+      "day_number": 2,
+      "title": "Обсерватория и базары",
+      "description": "09:00 - Завтрак. 10:00 - Экскурсия в обсерваторию Улугбека. 12:00 - Посещение мечети Биби-Ханум. 14:00 - Обед. 15:30 - Прогулка по базару Сиаб. 17:00 - Мастер-класс по каллиграфии. 19:00 - Ужин с традиционным шоу.",
+      "image": ""
+    }
+  },
+  {
+    "model": "tours.tourschedule",
+    "pk": 5,
+    "fields": {
+      "tour": 2,
+      "day_number": 3,
+      "title": "Шахи-Зинда и отъезд",
+      "description": "09:00 - Завтрак. 10:00 - Некрополь Шахи-Зинда, усыпальница святых. 12:00 - Свободное время для покупок. 14:00 - Обед. 15:30 - Выезд в Ташкент.",
+      "image": ""
+    }
+  },
+  {
+    "model": "tours.tourparametervalue",
+    "pk": 1,
+    "fields": {
+      "tour": 1,
+      "parameter_definition": 1,
+      "value": "Средний"
+    }
+  },
+  {
+    "model": "tours.tourparametervalue",
+    "pk": 2,
+    "fields": {
+      "tour": 1,
+      "parameter_definition": 4,
+      "value": "8.5"
+    }
+  },
+  {
+    "model": "tours.tourparametervalue",
+    "pk": 3,
+    "fields": {
+      "tour": 3,
+      "parameter_definition": 2,
+      "value": "220"
+    }
+  },
+  {
+    "model": "tours.tourparametervalue",
+    "pk": 4,
+    "fields": {
+      "tour": 2,
+      "parameter_definition": 3,
+      "value": "Средневековье"
+    }
+  },
+  {
+    "model": "tours.tourparametervalue",
+    "pk": 5,
+    "fields": {
+      "tour": 5,
+      "parameter_definition": 1,
+      "value": "Сложный"
+    }
+  },
+  {
+    "model": "tours.tourparametervalue",
+    "pk": 6,
+    "fields": {
+      "tour": 5,
+      "parameter_definition": 4,
+      "value": "32.0"
+    }
+  }
+] 

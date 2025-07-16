@@ -52,9 +52,9 @@ class TourSessionInline(admin.TabularInline):
 
 @admin.register(Tour)
 class TourAdmin(admin.ModelAdmin):
-    list_display = ("title", "agency", "type", "price_from", "is_active")
-    list_filter = ("is_active", "type", "agency")
-    search_fields = ("title", "description")
+    list_display = ("title", "agency", "type", "price_from", "sessions_count", "is_active")
+    list_filter = ("is_active", "type", "agency", "created_at", "season_start")
+    search_fields = ("title", "description", "agency__name")
     prepopulated_fields = {"slug": ("title",)}
     autocomplete_fields = ['agency', 'type', 'participants']
     inlines = [TourSessionInline, TourParameterValueInline, TourScheduleInline]
@@ -76,6 +76,22 @@ class TourAdmin(admin.ModelAdmin):
             'fields': ('is_active', 'created_at', 'updated_at')
         }),
     )
+    
+    actions = ['activate_tours', 'deactivate_tours']
+    
+    def sessions_count(self, obj):
+        return obj.sessions.count()
+    sessions_count.short_description = 'Sessions'
+    
+    def activate_tours(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'{updated} tours activated.')
+    activate_tours.short_description = "Activate selected tours"
+    
+    def deactivate_tours(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'{updated} tours deactivated.')
+    deactivate_tours.short_description = "Deactivate selected tours"
 
 
 @admin.register(TourSession)

@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from . import api
 
 router = DefaultRouter()
-# Когда создадим ViewSets, добавим их здесь
-# router.register(r'logs', api.SystemLogViewSet, basename='system-log')
+router.register(r'configs', api.SystemConfigViewSet, basename='system-config')
+router.register(r'logs', api.SystemLogEntryViewSet, basename='system-log')
 
 urlpatterns = router.urls

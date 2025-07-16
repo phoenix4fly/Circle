@@ -58,6 +58,8 @@ class BookingAdmin(admin.ModelAdmin):
     )
 
     ordering = ['-created_at']
+    
+    actions = ['approve_bookings', 'cancel_bookings', 'mark_as_paid']
 
     fieldsets = (
         ("📌 Пользователь", {
@@ -103,3 +105,26 @@ class BookingAdmin(admin.ModelAdmin):
         if request.user.is_staff and request.user.agency:
             return qs.filter(session__tour__agency=request.user.agency)
         return qs.none()
+    
+    def approve_bookings(self, request, queryset):
+        from django.utils import timezone
+        updated = queryset.filter(status='requested').update(
+            status='approved', 
+            approved_by=request.user,
+            approved_at=timezone.now()
+        )
+        self.message_user(request, f'{updated} bookings approved.')
+    approve_bookings.short_description = "Approve selected bookings"
+    
+    def cancel_bookings(self, request, queryset):
+        updated = queryset.exclude(status__in=['paid', 'cancelled']).update(
+            status='cancelled',
+            cancel_reason='Cancelled by admin'
+        )
+        self.message_user(request, f'{updated} bookings cancelled.')
+    cancel_bookings.short_description = "Cancel selected bookings"
+    
+    def mark_as_paid(self, request, queryset):
+        updated = queryset.filter(status='approved').update(status='paid')
+        self.message_user(request, f'{updated} bookings marked as paid.')
+    mark_as_paid.short_description = "Mark selected bookings as paid"

@@ -6,20 +6,29 @@ from .models import SystemConfig, SystemLogEntry
 
 @admin.register(SystemConfig)
 class SystemConfigAdmin(admin.ModelAdmin):
-    list_display = ('key', 'value', 'description', 'is_active', 'updated_at')
+    list_display = ('key', 'value_preview', 'is_active', 'updated_at')
+    list_filter = ('is_active', 'updated_at')
     search_fields = ('key', 'value', 'description')
-    list_filter = ('is_active',)
-    ordering = ('key',)
     readonly_fields = ('updated_at',)
-
+    ordering = ['key']
+    
     fieldsets = (
         (None, {
-            'fields': ('key', 'value', 'description', 'is_active')
+            'fields': ('key', 'value', 'is_active')
         }),
-        ('Системные поля', {
+        ('Documentation', {
+            'fields': ('description',)
+        }),
+        ('Meta', {
             'fields': ('updated_at',)
         }),
     )
+    
+    def value_preview(self, obj):
+        if len(obj.value) > 50:
+            return obj.value[:50] + '...'
+        return obj.value
+    value_preview.short_description = 'Value'
 
 
 @admin.register(SystemLogEntry)

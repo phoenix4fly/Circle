@@ -1,0 +1,197 @@
+[
+  {
+    "model": "users.sphere",
+    "pk": 1,
+    "fields": {
+      "name": "Информационные технологии",
+      "description": "Разработка, аналитика, дизайн, тестирование",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 2,
+    "fields": {
+      "name": "Медицина и здравоохранение",
+      "description": "Врачи, медсестры, фармацевты, исследователи",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 3,
+    "fields": {
+      "name": "Образование",
+      "description": "Преподаватели, тренеры, методисты",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 4,
+    "fields": {
+      "name": "Финансы и банковское дело",
+      "description": "Аналитики, банкиры, экономисты",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.sphere",
+    "pk": 5,
+    "fields": {
+      "name": "Маркетинг и реклама",
+      "description": "SMM, контент-менеджеры, таргетологи",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 1,
+    "fields": {
+      "sphere": 1,
+      "name": "Frontend разработчик",
+      "description": "React, Vue, Angular",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 2,
+    "fields": {
+      "sphere": 1,
+      "name": "Backend разработчик",
+      "description": "Python, Django, FastAPI",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 3,
+    "fields": {
+      "sphere": 1,
+      "name": "Data Scientist",
+      "description": "Анализ данных, машинное обучение",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 4,
+    "fields": {
+      "sphere": 2,
+      "name": "Терапевт",
+      "description": "Врач общей практики",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.specialization",
+    "pk": 5,
+    "fields": {
+      "sphere": 3,
+      "name": "Преподаватель английского",
+      "description": "ESL, IELTS, бизнес-английский",
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$dummy",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aidar_dev",
+      "first_name": "Айдар",
+      "last_name": "Рахимов",
+      "email": "aidar@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-01T10:00:00Z",
+      "avatar": "",
+      "gender": "M",
+      "sphere": 1,
+      "specialization": 2,
+      "bio": "Backend разработчик с 3-летним опытом. Люблю путешествия и горы!",
+      "interests": "Программирование, хайкинг, фотография",
+      "phone_number": "+998901234567",
+      "telegram_id": 123456789,
+      "last_online": "2024-12-15T16:30:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$dummy",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "malika_designer",
+      "first_name": "Малика",
+      "last_name": "Умарова",
+      "email": "malika@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-11-15T14:20:00Z",
+      "avatar": "",
+      "gender": "F",
+      "sphere": 5,
+      "specialization": null,
+      "bio": "UX/UI дизайнер и путешественница. Обожаю открывать новые места!",
+      "interests": "Дизайн, путешествия, йога, кафе",
+      "phone_number": "+998907654321",
+      "telegram_id": 987654321,
+      "last_online": "2024-12-15T18:45:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$dummy",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "jamshid_doctor",
+      "first_name": "Жамшид",
+      "last_name": "Каримов",
+      "email": "jamshid@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-20T09:15:00Z",
+      "avatar": "",
+      "gender": "M",
+      "sphere": 2,
+      "specialization": 4,
+      "bio": "Врач-терапевт, ценю активный отдых и природу",
+      "interests": "Медицина, альпинизм, чтение",
+      "phone_number": "+998911111111",
+      "telegram_id": 555666777,
+      "last_online": "2024-12-14T20:10:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$dummy",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "nodira_teacher",
+      "first_name": "Нодира",
+      "last_name": "Ахмедова",
+      "email": "nodira@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-10T11:30:00Z",
+      "avatar": "",
+      "gender": "F",
+      "sphere": 3,
+      "specialization": 5,
+      "bio": "Преподаватель английского, люблю культурные поездки",
+      "interests": "Языки, история, музеи, театр",
+      "phone_number": "+998933333333",
+      "telegram_id": 111222333,
+      "last_online": "2024-12-15T12:20:00Z"
+    }
+  }
+] 
