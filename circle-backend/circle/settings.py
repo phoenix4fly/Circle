@@ -9,7 +9,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here-change-in-production')
+SECRET_KEY = os.getenv('SECRET_KEY', 'circle-k7x9m@n2v5w8z#A$D%G*J-N4R6U9Y$b&E(H+MbQeThWmZq4t7w!z%C*F)J@NcRf')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
@@ -46,6 +46,7 @@ LOCAL_APPS = [
     'apps.custom_trips',
     'apps.media',
     'apps.core',
+    'apps.telegram_auth',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -82,25 +83,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'circle.wsgi.application'
 
-# Database - временно SQLite для разработки
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Database configuration
+USE_POSTGRES = os.getenv('USE_POSTGRES', 'False').lower() == 'true'
 
-# PostgreSQL конфигурация (закомментирована)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME', 'circle_db'),
-#         'USER': os.getenv('DB_USER', 'circle_user'),
-#         'PASSWORD': os.getenv('DB_PASSWORD', 'circle_password'),
-#         'HOST': os.getenv('DB_HOST', 'localhost'),
-#         'PORT': os.getenv('DB_PORT', '5432'),
-#     }
-# }
+if USE_POSTGRES:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'circle_db'),
+            'USER': os.getenv('DB_USER', 'circle_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'circle_password'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
+else:
+    # SQLite для разработки
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.User'
@@ -237,8 +241,11 @@ LOGGING = {
 # Create logs directory
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
-# Telegram Bot Settings (для будущего)
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+# Telegram Bot Settings
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+if not BOT_TOKEN:
+    print("⚠️  WARNING: BOT_TOKEN не установлен! Telegram авторизация не будет работать.")
+    print("   Создайте .env файл или установите переменную окружения BOT_TOKEN")
 TELEGRAM_WEBHOOK_URL = os.getenv('TELEGRAM_WEBHOOK_URL', '')
 
 # Payme Settings (для будущего)

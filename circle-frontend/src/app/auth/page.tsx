@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { EyeIcon, EyeSlashIcon, PhoneIcon, EnvelopeIcon, UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { apiClient, tokenUtils, type RegisterData, type LoginData } from '@/lib/api';
+import { useTelegramAuth } from '@/hooks/useTelegramAuth';
+import { TelegramUtils } from '@/lib/telegram';
 
 export default function AuthPage() {
   const router = useRouter();
+  const { isLoading: telegramLoading, isAuthenticated, isInTelegram, login: telegramLogin, error: telegramError } = useTelegramAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,6 +31,51 @@ export default function AuthPage() {
     confirmPassword: '',
     agreedToTerms: false
   });
+
+  // Telegram WebApp авторизация
+  useEffect(() => {
+    // Если уже авторизован, ничего не делаем (хук сам перенаправит)
+    if (isAuthenticated) return;
+
+    // Автоматическая авторизация только если есть ВАЛИДНЫЕ initData
+    if (isInTelegram && !telegramLoading) {
+      const initData = TelegramUtils.getInitData();
+      console.log('🔍 Auto-auth check:', {
+        isInTelegram,
+        telegramLoading,
+        initDataLength: initData?.length || 0,
+        hasHash: initData?.includes('hash=') || false
+      });
+      
+      // Только если initData содержат hash (признак валидности)
+      if (initData && initData.length > 50 && initData.includes('hash=')) {
+        console.log('✅ Автоматическая Telegram авторизация...');
+        telegramLogin();
+      } else {
+        console.log('ℹ️ Пропускаем автоматическую авторизацию - initData неполные');
+      }
+    }
+  }, [isInTelegram, isAuthenticated, telegramLoading, telegramLogin]);
+
+  // Показываем загрузку Telegram авторизации
+  if (telegramLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center font-helvetica">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg animate-pulse">
+            <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Circle</h1>
+          <p className="text-gray-600 text-sm">Выполняем вход через Telegram...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Если уже авторизован, ничего не показываем
+  if (isAuthenticated) {
+    return null;
+  }
 
   // Функции для обработки форм
   const handleLogin = async (e: React.FormEvent) => {
@@ -156,6 +204,65 @@ export default function AuthPage() {
 
       {/* Основной контент */}
       <main className="flex-1 px-4 py-6">
+        {/* Telegram авторизация */}
+        {isInTelegram && (
+          <div className="max-w-md mx-auto mb-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-gray-900/5 border border-gray-200/50">
+              <div className="text-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-2xl">🚀</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Быстрый вход</h3>
+                <p className="text-gray-600 text-sm">Войдите через Telegram одним нажатием</p>
+              </div>
+              
+              {/* Дебаг информация в dev режиме */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-700">
+                    <strong>Debug:</strong> initData length: {TelegramUtils.getInitData()?.length || 0}
+                    {TelegramUtils.getInitData()?.includes('hash=') ? ' ✅' : ' ❌ no hash'}
+                  </p>
+                </div>
+              )}
+              
+              {/* Ошибки Telegram авторизации */}
+              {telegramError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700 font-medium">{telegramError}</p>
+                  <p className="text-xs text-red-600 mt-1">
+                    Попробуйте обычную форму входа ниже или{' '}
+                    <a href="/debug" className="text-red-800 underline hover:text-red-900">
+                      проверьте статус сервера
+                    </a>
+                  </p>
+                  <details className="mt-2">
+                    <summary className="text-xs cursor-pointer text-red-600 hover:text-red-800">Техническая информация</summary>
+                    <p className="text-xs text-red-600 mt-1 font-mono">
+                      initData: {TelegramUtils.getInitData()?.substring(0, 50) || 'empty'}...
+                    </p>
+                  </details>
+                </div>
+              )}
+              
+              <button
+                onClick={telegramLogin}
+                disabled={telegramLoading}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-300 text-white py-3 px-4 rounded-xl font-semibold text-sm shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none"
+              >
+                {telegramLoading ? 'Входим...' : '🚀 Войти через Telegram'}
+              </button>
+            </div>
+            
+            {/* Разделитель */}
+            <div className="flex items-center my-6">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-4 text-gray-500 text-sm">или</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+          </div>
+        )}
+
         {/* Табы */}
         <div className="bg-gray-200/60 backdrop-blur-sm rounded-xl p-1 mb-6 max-w-md mx-auto">
           <div className="grid grid-cols-2 gap-1">

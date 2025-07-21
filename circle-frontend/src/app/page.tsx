@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { UserIcon, BellIcon, MapPinIcon, CalendarIcon, UsersIcon, HomeIcon, MagnifyingGlassIcon, ChatBubbleLeftRightIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useTelegramAuth } from '@/hooks/useTelegramAuth';
 
 // Моковые данные для туров с участниками
 const mockTours = [
@@ -195,8 +197,37 @@ const ParticipantsModal = ({ tour, isOpen, onClose }: { tour: Tour | null; isOpe
 };
 
 export default function HomePage() {
+  const router = useRouter();
+  const { isLoading, isAuthenticated, user, isInTelegram } = useTelegramAuth();
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
+
+  // Проверка авторизации
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth');
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  // Показываем загрузку пока проверяется авторизация
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center font-helvetica px-4">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg animate-pulse">
+            <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Circle</h1>
+          <p className="text-gray-600 text-sm">Загружаем ваш профиль...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Если не авторизован, ничего не показываем (происходит редирект)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const openParticipantsModal = (tour: Tour) => {
     setSelectedTour(tour);
@@ -216,10 +247,14 @@ export default function HomePage() {
           {/* Мини-профиль */}
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">Р</span>
+              <span className="text-white text-sm font-medium">
+                {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'C'}
+              </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">Привет, Рамазон!</p>
+              <p className="text-sm font-medium text-gray-900">
+                Привет, {user?.first_name || 'Путешественник'}!
+              </p>
               <p className="text-xs text-gray-500">Найди свою компанию</p>
             </div>
           </div>

@@ -8,4 +8,7 @@ router = DefaultRouter()
 router.register(r'configs', api.SystemConfigViewSet, basename='system-config')
 router.register(r'logs', api.SystemLogEntryViewSet, basename='system-log')
 
-urlpatterns = router.urls
+urlpatterns = [
+    # Health Check
+    path('health/', api.health_check, name='health-check'),
+] + router.urls

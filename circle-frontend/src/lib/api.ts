@@ -107,6 +107,8 @@ export interface AuthResponse {
   message: string;
   user: User;
   tokens: AuthTokens;
+  is_new_user?: boolean;
+  onboarding_required?: boolean;
 }
 
 export interface RegisterData {
@@ -195,7 +197,7 @@ const httpClient = {
 
       // Если токен истек, попробуем обновить
       if (response.status === 401 && tokens?.refresh) {
-        const refreshResponse = await fetch(`${API_BASE_URL}/users/token/refresh/`, {
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh: tokens.refresh }),
@@ -267,17 +269,30 @@ const httpClient = {
 
 // API клиент
 export const apiClient = {
-  // Аутентификация
+  // Telegram аутентификация
+  async telegramAuth(initData: string): Promise<AuthResponse> {
+    return httpClient.post('/auth/telegram/', { init_data: initData });
+  },
+
+  async refreshToken(refreshToken: string): Promise<{ access: string; refresh: string }> {
+    return httpClient.post('/auth/refresh/', { refresh: refreshToken });
+  },
+
+  async logout(refreshToken: string): Promise<{ message: string }> {
+    return httpClient.post('/auth/logout/', { refresh: refreshToken });
+  },
+
+  async getMe(): Promise<User> {
+    return httpClient.get('/auth/me/');
+  },
+
+  // Обычная аутентификация (для fallback)
   async register(data: RegisterData): Promise<AuthResponse> {
     return httpClient.post('/users/register/', data);
   },
 
   async login(data: LoginData): Promise<AuthResponse> {
     return httpClient.post('/users/login/', data);
-  },
-
-  async getMe(): Promise<User> {
-    return httpClient.get('/users/me/');
   },
 
   // Onboarding
