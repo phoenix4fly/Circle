@@ -10,7 +10,7 @@ import { TelegramUtils } from '@/lib/telegram';
 export default function AuthPage() {
   const router = useRouter();
   const { isLoading: telegramLoading, isAuthenticated, isInTelegram, login: telegramLogin, error: telegramError } = useTelegramAuth();
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [activeTab, setActiveTab] = useState<'login' | 'register' | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,12 +84,27 @@ export default function AuthPage() {
     setError(null);
 
     try {
-      console.log('Попытка входа:', { login: loginForm.phoneOrEmail });
+      console.log('🔧 DEV Login Form State:', {
+        phoneOrEmail: loginForm.phoneOrEmail,
+        passwordLength: loginForm.password?.length || 0,
+        passwordEmpty: !loginForm.password || loginForm.password.trim() === ''
+      });
+
+      // Проверяем что пароль не пустой
+      if (!loginForm.password || loginForm.password.trim() === '') {
+        throw new Error('Пароль обязателен для DEV авторизации!');
+      }
       
       const loginData: LoginData = {
         login: loginForm.phoneOrEmail,
         password: loginForm.password
       };
+
+      console.log('📤 Отправляемые данные:', {
+        login: loginData.login,
+        passwordLength: loginData.password.length,
+        hasPassword: !!loginData.password
+      });
 
       const response = await apiClient.login(loginData);
       
@@ -263,36 +278,51 @@ export default function AuthPage() {
             </div>
           </div>
         ) : (
-          /* Обычная авторизация (в браузере) */
-          <>
-            {/* Telegram авторизация для браузера (опционально) */}
-            <div className="max-w-md mx-auto mb-6">
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-gray-900/5 border border-gray-200/50">
-                <div className="text-center mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-2xl">📱</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Быстрый вход</h3>
-                  <p className="text-gray-600 text-sm">Есть Telegram? Войдите одним нажатием</p>
+          /* Обычная авторизация убрана - только Telegram */
+          <div className="max-w-md mx-auto flex items-center justify-center min-h-[60vh]">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-gray-900/5 border border-gray-200/50">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📱</span>
                 </div>
-                
-                <button
-                  onClick={() => window.open('https://t.me/YourCircleBot', '_blank')}
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-semibold text-sm shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 transform hover:-translate-y-0.5"
-                >
-                  📱 Открыть в Telegram
-                </button>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Circle доступен только в Telegram</h2>
+                <p className="text-gray-600 text-sm mb-4">Для использования приложения откройте его в Telegram</p>
               </div>
               
-              {/* Разделитель */}
-              <div className="flex items-center my-6">
-                <div className="flex-1 border-t border-gray-300"></div>
-                <span className="px-4 text-gray-500 text-sm">или</span>
-                <div className="flex-1 border-t border-gray-300"></div>
-              </div>
-            </div>
+              <button
+                onClick={() => window.open('https://t.me/YourCircleBot', '_blank')}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 transform hover:-translate-y-0.5 mb-4"
+              >
+                📱 Открыть в Telegram
+              </button>
 
-            {/* Табы */}
+              {/* Для разработчиков - кнопка показать форму */}
+              {process.env.NODE_ENV === 'development' && (
+                <details className="mt-4">
+                  <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                    🔧 Режим разработчика
+                  </summary>
+                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-xs text-yellow-700 mb-2">
+                      ⚠️ Для тестирования. В продакшене доступ только через Telegram.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('login')}
+                      className="text-xs bg-yellow-200 hover:bg-yellow-300 text-yellow-800 px-2 py-1 rounded"
+                    >
+                      Показать форму входа
+                    </button>
+                  </div>
+                </details>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Скрытые формы для разработчиков */}
+        {process.env.NODE_ENV === 'development' && activeTab !== null && !isInTelegram && (
+          <>
+            {/* Табы только в development */}
             <div className="bg-gray-200/60 backdrop-blur-sm rounded-xl p-1 mb-6 max-w-md mx-auto">
               <div className="grid grid-cols-2 gap-1">
                 <button
@@ -306,7 +336,7 @@ export default function AuthPage() {
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
                 >
-                  Вход
+                  Вход (Dev)
                 </button>
                 <button
                   onClick={() => {
@@ -319,17 +349,27 @@ export default function AuthPage() {
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
                 >
-                  Регистрация
+                  Регистрация (Dev)
                 </button>
               </div>
             </div>
 
-            {/* Форма входа */}
+            {/* Форма входа для разработчиков */}
             {activeTab === 'login' && (
               <div className="max-w-md mx-auto space-y-4">
                 <form onSubmit={handleLogin}>
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-gray-900/5 border border-gray-200/50">
-                    <h2 className="text-lg font-bold text-gray-900 mb-5">Добро пожаловать!</h2>
+                    <h2 className="text-lg font-bold text-gray-900 mb-2">🔧 Режим разработчика</h2>
+                    <p className="text-xs text-yellow-700 mb-2 bg-yellow-50 p-2 rounded">
+                      ⚠️ Обычная авторизация. Требуется логин И пароль!
+                    </p>
+                    
+                    {/* DEBUG INFO */}
+                    <div className="text-xs text-gray-600 mb-4 bg-gray-50 p-2 rounded border">
+                      <strong>Debug:</strong><br/>
+                      📧 Login: {loginForm.phoneOrEmail ? '✅' : '❌'} ({loginForm.phoneOrEmail.length} chars)<br/>
+                      🔐 Password: {loginForm.password ? '✅' : '❌'} ({loginForm.password?.length || 0} chars)
+                    </div>
                     
                     {/* Ошибки */}
                     {error && (
@@ -359,7 +399,7 @@ export default function AuthPage() {
                     {/* Поле пароля */}
                     <div className="mb-6">
                       <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-                        Пароль
+                        Пароль <span className="text-red-500">*ОБЯЗАТЕЛЬНО*</span>
                       </label>
                       <div className="relative">
                         <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -368,8 +408,9 @@ export default function AuthPage() {
                           value={loginForm.password}
                           onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                           placeholder="Введите пароль"
-                          className="w-full pl-9 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
+                          className="w-full pl-9 pr-12 py-3 border border-red-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
                           required
+                          minLength={1}
                         />
                         <button
                           type="button"
@@ -385,51 +426,28 @@ export default function AuthPage() {
                       </div>
                     </div>
 
-                    {/* Забыли пароль */}
-                    <div className="text-right mb-6">
-                      <button
-                        type="button"
-                        className="text-xs text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-                      >
-                        Забыли пароль?
-                      </button>
-                    </div>
-
                     {/* Кнопка входа */}
                     <button
                       type="submit"
                       disabled={isLoading || !loginForm.phoneOrEmail || !loginForm.password}
-                      className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:from-gray-300 disabled:to-gray-300 text-white py-3 px-4 rounded-xl font-semibold text-sm shadow-lg shadow-primary-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary-500/30 transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 disabled:from-gray-300 disabled:to-gray-300 text-white py-3 px-4 rounded-xl font-semibold text-sm shadow-lg shadow-yellow-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-yellow-500/30 transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none disabled:cursor-not-allowed"
                     >
-                      {isLoading ? 'Входим...' : 'Войти в Circle'}
+                      {isLoading ? 'Входим...' : '🔧 Dev Login'}
                     </button>
                   </div>
                 </form>
-                
-                {/* Ссылка на регистрацию */}
-                <div className="text-center">
-                  <p className="text-xs text-gray-600">
-                    Нет аккаунта?{' '}
-                    <button
-                      onClick={() => {
-                        setActiveTab('register');
-                        setError(null);
-                      }}
-                      className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-                    >
-                      Пройдите регистрацию
-                    </button>
-                  </p>
-                </div>
               </div>
             )}
 
-            {/* Форма регистрации */}
+            {/* Форма регистрации для разработчиков - оставляем как есть */}
             {activeTab === 'register' && (
               <div className="max-w-md mx-auto space-y-4">
                 <form onSubmit={handleRegister}>
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-gray-900/5 border border-gray-200/50">
-                    <h2 className="text-lg font-bold text-gray-900 mb-5">Создать аккаунт</h2>
+                    <h2 className="text-lg font-bold text-gray-900 mb-2">🔧 Регистрация (Dev)</h2>
+                    <p className="text-xs text-yellow-700 mb-4 bg-yellow-50 p-2 rounded">
+                      ⚠️ Режим разработчика
+                    </p>
                     
                     {/* Ошибки */}
                     {error && (
@@ -607,31 +625,27 @@ export default function AuthPage() {
                         !registerForm.confirmPassword ||
                         registerForm.password !== registerForm.confirmPassword
                       }
-                      className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-3 px-4 rounded-xl font-semibold text-sm shadow-lg shadow-primary-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary-500/30 transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none"
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-3 px-4 rounded-xl font-semibold text-sm shadow-lg shadow-yellow-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-yellow-500/30 transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none"
                     >
-                      {isLoading ? 'Создаем аккаунт...' : 'Создать аккаунт'}
+                      {isLoading ? 'Создаем аккаунт...' : '🔧 Dev Register'}
                     </button>
                   </div>
                 </form>
-                
-                {/* Ссылка на вход */}
-                <div className="text-center">
-                  <p className="text-xs text-gray-600">
-                    Уже есть аккаунт?{' '}
-                    <button
-                      onClick={() => {
-                        setActiveTab('login');
-                        setError(null);
-                      }}
-                      className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-                    >
-                      Войдите
-                    </button>
-                  </p>
-                </div>
               </div>
             )}
           </>
+        )}
+
+        {/* Кнопка скрыть форму (dev) */}
+        {process.env.NODE_ENV === 'development' && activeTab && !isInTelegram && (
+          <div className="text-center mt-4">
+            <button
+              onClick={() => setActiveTab(null)}
+              className="text-xs text-gray-500 hover:text-gray-700"
+            >
+              ← Скрыть формы разработчика
+            </button>
+          </div>
         )}
       </main>
 
