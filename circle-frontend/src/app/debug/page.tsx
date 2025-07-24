@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function DebugPage() {
   const [apiStatus, setApiStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -160,18 +161,18 @@ export default function DebugPage() {
           {/* Ссылки */}
           <div className="border-t pt-6 mt-6">
             <div className="flex space-x-4">
-              <a 
+              <Link 
                 href="/" 
                 className="text-blue-500 hover:text-blue-600 text-sm font-medium"
               >
                 ← Вернуться на главную
-              </a>
-              <a 
+              </Link>
+              <Link 
                 href="/auth" 
                 className="text-blue-500 hover:text-blue-600 text-sm font-medium"
               >
                 Страница входа →
-              </a>
+              </Link>
             </div>
           </div>
         </div>

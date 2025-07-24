@@ -3,23 +3,24 @@ from .models import Media
 
 
 class MediaSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+    title = serializers.CharField(read_only=True)
 
     class Meta:
         model = Media
         fields = [
             'id',
-            'file',
-            'file_url',
+            'url',
+            'title',
             'media_type',
             'description',
             'uploaded_by',
-            'is_active',
+            'is_public',
             'created_at'
         ]
-        read_only_fields = ['uploaded_by', 'created_at', 'file_url']
+        read_only_fields = ['uploaded_by', 'created_at', 'url']
 
-    def get_file_url(self, obj):
+    def get_url(self, obj):
         request = self.context.get('request')
         if obj.file and hasattr(obj.file, 'url'):
             return request.build_absolute_uri(obj.file.url) if request else obj.file.url

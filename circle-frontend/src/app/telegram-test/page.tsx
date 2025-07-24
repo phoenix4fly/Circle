@@ -73,7 +73,7 @@ export default function TelegramTestPage() {
                   <ol className="list-decimal list-inside space-y-1 ml-2">
                     <li>Откройте вашего Telegram бота</li>
                     <li>Нажмите /start</li>
-                    <li>Нажмите кнопку "🌍 Открыть Circle"</li>
+                    <li>Нажмите кнопку &quot;🌍 Открыть Circle&quot;</li>
                   </ol>
                 </div>
               </div>

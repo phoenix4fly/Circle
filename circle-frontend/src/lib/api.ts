@@ -353,6 +353,117 @@ export const apiClient = {
   }
 };
 
+// Типы для туров
+export interface TourCategory {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface Tour {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string;
+  category?: TourCategory;
+  price_from: number;
+  base_price?: number;
+  duration_days: number;
+  duration_nights?: number;
+  distance_from_tashkent_km?: number;
+  transport_options?: string;
+  main_image?: {
+    id: number;
+    url: string;
+    title?: string;
+  };
+  gallery?: Array<{
+    id: number;
+    url: string;
+    title?: string;
+  }>;
+  schedule?: Array<{
+    id: number;
+    day: number;
+    title: string;
+    description: string;
+  }>;
+  sessions?: Array<{
+    id: number;
+    start_date: string;
+    end_date: string;
+    price: number;
+    max_participants: number;
+    current_participants: number;
+    available_seats: number;
+    is_active: boolean;
+  }>;
+  participants?: Array<{
+    id: number;
+    first_name: string;
+    last_name: string;
+    sphere_name?: string;
+    specialization_name?: string;
+    avatar?: string;
+  }>;
+  is_active: boolean;
+}
+
+export interface TourFilters {
+  type?: number;
+  price_min?: number;
+  price_max?: number;
+  search?: string;
+  ordering?: string;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+// API методы для туров
+export const toursApi = {
+  // Получить список категорий
+  async getCategories(): Promise<PaginatedResponse<TourCategory>> {
+    return httpClient.get('/tours/categories/');
+  },
+
+  // Получить список туров с фильтрами
+  async getTours(filters?: TourFilters, page?: number): Promise<PaginatedResponse<Tour>> {
+    const params = new URLSearchParams();
+    
+    if (filters?.type) params.append('type', filters.type.toString());
+    if (filters?.price_min) params.append('price_min', filters.price_min.toString());
+    if (filters?.price_max) params.append('price_max', filters.price_max.toString());
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.ordering) params.append('ordering', filters.ordering);
+    if (page) params.append('page', page.toString());
+
+    const queryString = params.toString();
+    const url = `/tours/tours/${queryString ? '?' + queryString : ''}`;
+    
+    return httpClient.get(url);
+  },
+
+  // Получить детальную информацию о туре
+  async getTourById(id: number): Promise<Tour> {
+    return httpClient.get(`/tours/tours/${id}/`);
+  },
+
+  // Получить тур по slug
+  async getTourBySlug(slug: string): Promise<Tour> {
+    const response = await httpClient.get(`/tours/tours/?search=${slug}`);
+    const tour = response.results.find((t: Tour) => t.slug === slug);
+    if (!tour) {
+      throw new ApiError('Tour not found', 404);
+    }
+    return tour;
+  }
+};
+
 // Экспортируем типы ошибок
 export class ApiError extends Error {
   constructor(

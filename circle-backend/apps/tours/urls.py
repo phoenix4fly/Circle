@@ -5,6 +5,7 @@ from .api import PromotionViewSet, PromoCodeViewSet
 router = DefaultRouter()
 router.register(r'tours', TourViewSet, basename='tour')
 router.register(r'categories', TourCategoryViewSet, basename='tour-category')
+
 router.register(r'promotions', PromotionViewSet, basename='promotion')
 router.register(r'promocodes', PromoCodeViewSet, basename='promocode')
 

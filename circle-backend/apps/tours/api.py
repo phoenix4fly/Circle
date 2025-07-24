@@ -1,9 +1,11 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 from .models import Tour, TourCategory
 from .serializers import (
     TourListSerializer,
     TourDetailSerializer,
-    TourCategorySerializer
+    TourCategorySerializer,
 )
 
 
@@ -17,16 +19,31 @@ class TourCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.AllowAny]
 
 
+
+
+
 class TourViewSet(viewsets.ReadOnlyModelViewSet):
     """
     /api/tours/
-    - GET → список туров (витрина)
+    - GET → список туров (витрина) с фильтрацией
     - GET /{id}/ → детальная страница тура
+    
+    Фильтры:
+    - ?category={id} - по типу тура
+    - ?destination={id} - по направлению  
+    - ?price_min={amount} - минимальная цена
+    - ?price_max={amount} - максимальная цена
+    - ?search={text} - поиск по названию/описанию
     """
     permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['type']
+    search_fields = ['title', 'description']
+    ordering_fields = ['price_from', 'duration_days', 'created_at']
+    ordering = ['-created_at']
 
     def get_queryset(self):
-        return (
+        queryset = (
             Tour.objects.filter(is_active=True)
             .select_related('type', 'agency')
             .prefetch_related(
@@ -37,6 +54,24 @@ class TourViewSet(viewsets.ReadOnlyModelViewSet):
                 'participants'
             )
         )
+        
+        # Фильтр по цене
+        price_min = self.request.query_params.get('price_min')
+        price_max = self.request.query_params.get('price_max')
+        
+        if price_min:
+            try:
+                queryset = queryset.filter(price_from__gte=float(price_min))
+            except ValueError:
+                pass
+                
+        if price_max:
+            try:
+                queryset = queryset.filter(price_from__lte=float(price_max))
+            except ValueError:
+                pass
+        
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':

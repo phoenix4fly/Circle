@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserIcon, BellIcon, MapPinIcon, CalendarIcon, UsersIcon, HomeIcon, MagnifyingGlassIcon, ChatBubbleLeftRightIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useTelegramAuth } from '@/hooks/useTelegramAuth';
+import { Tour as ApiTour, toursApi } from '@/lib/api';
 
 // Моковые данные для туров с участниками
 const mockTours = [
@@ -120,12 +121,12 @@ const promotionalBanners = [
 
 // Турагентства
 const travelAgencies = [
-  { id: 1, name: "Vezdekhodi", logo: "🚗", rating: 4.8, tours: 45 },
-  { id: 2, name: "Travel Nation", logo: "✈️", rating: 4.9, tours: 62 },
-  { id: 3, name: "Wolf Travel", logo: "🐺", rating: 4.7, tours: 38 },
-  { id: 4, name: "Go Travel", logo: "🌍", rating: 4.6, tours: 51 },
-  { id: 5, name: "Tracker", logo: "🧭", rating: 4.8, tours: 29 },
-  { id: 6, name: "Poehali", logo: "🚀", rating: 4.9, tours: 73 }
+  { id: 1, name: "Vezdekhodi", logo: "http://127.0.0.1:8001/media/agency_logos/vezdekhodi.png", rating: 5.0, tours: 95 },
+  { id: 2, name: "Travel Nation", logo: "http://127.0.0.1:8001/media/agency_logos/travelnation.jpg", rating: 4.9, tours: 62 },
+  { id: 3, name: "Wolf Travel", logo: "http://127.0.0.1:8001/media/agency_logos/wolftravel.png", rating: 4.7, tours: 38 },
+  { id: 4, name: "Go Travel", logo: "http://127.0.0.1:8001/media/agency_logos/gotravel.png", rating: 4.6, tours: 51 },
+  { id: 5, name: "Tracker", logo: "http://127.0.0.1:8001/media/agency_logos/tracker.jpg", rating: 4.8, tours: 29 },
+  { id: 6, name: "Poehali", logo: "http://127.0.0.1:8001/media/agency_logos/poehali.jpg", rating: 4.9, tours: 73 }
 ];
 
 // Типы
@@ -134,6 +135,8 @@ interface User {
   name: string;
   avatar: string;
   color: string;
+  sphere?: string;
+  specialization?: string;
 }
 
 interface Tour {
@@ -156,14 +159,14 @@ const ParticipantsModal = ({ tour, isOpen, onClose }: { tour: Tour | null; isOpe
       <div className="bg-white rounded-t-2xl w-full max-w-md max-h-[70vh] overflow-hidden">
         {/* Заголовок модального окна */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-base font-semibold text-gray-900 font-helvetica">
             Участники тура
           </h3>
           <button 
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <XMarkIcon className="w-5 h-5 text-gray-500" />
+            <XMarkIcon className="w-4 h-4 text-gray-500" />
           </button>
         </div>
 
@@ -171,12 +174,14 @@ const ParticipantsModal = ({ tour, isOpen, onClose }: { tour: Tour | null; isOpe
         <div className="p-4 space-y-3 overflow-y-auto max-h-96">
           {tour.joinedUsers.map((user: User) => (
             <div key={user.id} className="flex items-center space-x-3">
-              <div className={`w-10 h-10 ${user.color} rounded-full flex items-center justify-center text-white text-sm font-medium`}>
+              <div className={`w-8 h-8 ${user.color} rounded-full flex items-center justify-center text-white text-xs font-medium`}>
                 {user.avatar}
               </div>
               <div>
-                <p className="font-medium text-gray-900">{user.name}</p>
-                <p className="text-sm text-gray-500">Участник Circle</p>
+                <p className="font-medium text-sm text-gray-900 font-helvetica">{user.name}</p>
+                <p className="text-xs text-gray-500 font-helvetica">
+                  {user.specialization && user.sphere ? `${user.specialization}, ${user.sphere}` : 'Участник Circle'}
+                </p>
               </div>
             </div>
           ))}
@@ -201,6 +206,20 @@ export default function HomePage() {
   const { isLoading, isAuthenticated, user, isInTelegram } = useTelegramAuth();
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
+  const [tours, setTours] = useState<ApiTour[]>([]);
+  const [toursLoading, setToursLoading] = useState(true);
+
+  // Функция для преобразования участников API в формат модального окна
+  const convertToModalParticipants = (participants: any[]): User[] => {
+    return participants.map((participant, index) => ({
+      id: participant.id,
+      name: `${participant.first_name} ${participant.last_name}`,
+      avatar: `${participant.first_name[0]}${participant.last_name[0]}`,
+      color: `bg-${['blue', 'green', 'purple', 'red', 'yellow', 'indigo', 'pink', 'teal'][index % 8]}-500`,
+      sphere: participant.sphere_name,
+      specialization: participant.specialization_name
+    }));
+  };
 
   // Проверка авторизации
   useEffect(() => {
@@ -208,6 +227,25 @@ export default function HomePage() {
       router.push('/auth');
     }
   }, [isLoading, isAuthenticated, router]);
+
+  // Загрузка туров
+  useEffect(() => {
+    const loadTours = async () => {
+      try {
+        setToursLoading(true);
+        const response = await toursApi.getTours({}, 1);
+        setTours(response.results.slice(0, 4)); // Берем только первые 4 тура для главной
+      } catch (error) {
+        console.error('Error loading tours:', error);
+      } finally {
+        setToursLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      loadTours();
+    }
+  }, [isAuthenticated]);
 
   // Показываем загрузку пока проверяется авторизация
   if (isLoading) {
@@ -217,8 +255,8 @@ export default function HomePage() {
           <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg animate-pulse">
             <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Circle</h1>
-          <p className="text-gray-600 text-sm">Загружаем ваш профиль...</p>
+          <h1 className="text-lg font-bold text-gray-900 mb-2 font-helvetica">Circle</h1>
+          <p className="text-gray-600 text-xs font-helvetica">Загружаем ваш профиль...</p>
         </div>
       </div>
     );
@@ -316,16 +354,31 @@ export default function HomePage() {
             {travelAgencies.map((agency) => (
               <div 
                 key={agency.id}
-                className="bg-white rounded-xl p-4 min-w-[140px] flex-shrink-0 border border-gray-100 hover:shadow-md transition-shadow"
+                className="bg-white rounded-xl min-w-[140px] h-32 flex-shrink-0 border border-gray-100 hover:shadow-md transition-shadow flex flex-col overflow-hidden"
               >
-                <div className="text-center">
-                  <div className="text-3xl mb-2">{agency.logo}</div>
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{agency.name}</h3>
+                {/* Логотип занимает верхнюю половину без отступов */}
+                <div className="h-16 w-full flex items-center justify-center bg-gray-50">
+                  <img 
+                    src={agency.logo} 
+                    alt={`${agency.name} логотип`}
+                    className="w-full h-full object-contain p-2"
+                    onError={(e) => {
+                      // Fallback к эмодзи если изображение не загружается
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.parentElement!.innerHTML = `<span class="text-3xl">${agency.name === 'Vezdekhodi' ? '🚗' : agency.name === 'Travel Nation' ? '✈️' : agency.name === 'Wolf Travel' ? '🐺' : agency.name === 'Go Travel' ? '🌍' : agency.name === 'Tracker' ? '🧭' : '🚀'}</span>`;
+                    }}
+                  />
+                </div>
+                
+                {/* Информация снизу с отступами */}
+                <div className="h-16 p-2 text-center flex flex-col justify-center">
+                  <h3 className="font-semibold text-gray-900 text-xs mb-1 font-helvetica">{agency.name}</h3>
                   <div className="flex items-center justify-center space-x-1 mb-1">
-                    <span className="text-yellow-400">⭐</span>
-                    <span className="text-xs text-gray-600">{agency.rating}</span>
+                    <span className="text-yellow-400 text-xs">⭐</span>
+                    <span className="text-xs text-gray-600 font-helvetica">{agency.rating}</span>
                   </div>
-                  <p className="text-xs text-gray-500">{agency.tours} туров</p>
+                  <p className="text-xs text-gray-500 font-helvetica">{agency.tours} туров</p>
                 </div>
               </div>
             ))}
@@ -345,68 +398,103 @@ export default function HomePage() {
 
           {/* Сетка туров - 2 колонки на всех экранах */}
           <div className="grid grid-cols-2 gap-3">
-            {mockTours.map((tour) => (
+            {toursLoading ? (
+              // Скелетон загрузки
+              Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="h-32 bg-gray-200 animate-pulse"></div>
+                  <div className="p-3">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              ))
+            ) : tours.map((tour) => (
               <div key={tour.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                 {/* Изображение */}
                 <div className="h-32 bg-gradient-to-r from-orange-400 to-orange-600 relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white text-xs font-medium text-center px-2">📸 {tour.title.split(':')[0]}</span>
-                  </div>
+                  {tour.main_image?.url ? (
+                    <img 
+                      src={tour.main_image.url} 
+                      alt={tour.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white text-xs font-medium text-center px-2">📸 {tour.title.substring(0, 20)}</span>
+                    </div>
+                  )}
                   <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-medium text-orange-600">
-                    {(tour.price / 1000).toFixed(0)}k
+                    {(Number(tour.price_from) / 1000).toFixed(0)}к
                   </div>
                 </div>
 
                 {/* Контент */}
-                <div className="p-3">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">{tour.title}</h3>
+                <div className="p-3 rounded-t-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2 text-xs leading-tight font-helvetica">{tour.title}</h3>
                   
                   <div className="space-y-1 mb-3">
-                    <div className="flex items-center text-xs text-gray-600">
+                    <div className="flex items-center text-xs text-gray-600 font-helvetica">
                       <MapPinIcon className="w-3 h-3 mr-1 text-orange-500" />
-                      {tour.location.split(',')[0]}
+                      {tour.category?.name || 'Тур'}
                     </div>
-                    <div className="flex items-center text-xs text-gray-600">
+                    <div className="flex items-center text-xs text-gray-600 font-helvetica">
                       <CalendarIcon className="w-3 h-3 mr-1 text-orange-500" />
-                      {tour.duration}
+                      {tour.duration_days} дн.
                     </div>
-                    <div className="flex items-center text-xs text-gray-600">
+                    <div className="flex items-center text-xs text-gray-600 font-helvetica">
                       <UsersIcon className="w-3 h-3 mr-1 text-orange-500" />
-                      {tour.participants}/{tour.maxParticipants}
+                      {tour.participants?.length || 0} участн.
                     </div>
                   </div>
 
                   {/* Аватарки участников */}
-                  {tour.joinedUsers.length > 0 && (
+                  {tour.participants && tour.participants.length > 0 && (
                     <div className="mb-3">
-                      <p className="text-xs text-gray-500 mb-1">Участники:</p>
+                      <p className="text-xs text-gray-500 mb-1 font-helvetica">Участники:</p>
                       <div 
                         className="flex items-center space-x-1 cursor-pointer group"
-                        onClick={() => openParticipantsModal(tour)}
+                        onClick={() => {
+                          const modalTour: Tour = {
+                            id: tour.id,
+                            title: tour.title,
+                            location: tour.category?.name || 'Тур',
+                            price: Number(tour.price_from),
+                            duration: `${tour.duration_days} дн.`,
+                                                         participants: tour.participants?.length || 0,
+                             maxParticipants: 15,
+                             joinedUsers: convertToModalParticipants(tour.participants || [])
+                          };
+                          openParticipantsModal(modalTour);
+                        }}
                       >
-                        {/* Показываем первые 3 аватарки для мобильного */}
-                        {tour.joinedUsers.slice(0, 3).map((user, index) => (
+                        {/* Показываем первые 3 аватарки */}
+                        {tour.participants.slice(0, 3).map((participant, index) => (
                           <div 
-                            key={user.id} 
-                            className={`w-6 h-6 ${user.color} rounded-full flex items-center justify-center text-white text-xs font-medium border border-white group-hover:scale-110 transition-transform`}
+                            key={participant.id} 
+                            className={`w-6 h-6 bg-${['blue', 'green', 'purple', 'red', 'yellow', 'indigo', 'pink', 'teal'][index % 8]}-500 rounded-full flex items-center justify-center text-white text-xs font-medium border border-white group-hover:scale-110 transition-transform`}
                             style={{ marginLeft: index > 0 ? '-4px' : '0' }}
                           >
-                            {user.avatar.charAt(0)}
+                            {participant.first_name?.[0]}{participant.last_name?.[0]}
                           </div>
                         ))}
                         
                         {/* Показываем "+X" если участников больше 3 */}
-                        {tour.joinedUsers.length > 3 && (
+                        {tour.participants.length > 3 && (
                           <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-medium border border-white group-hover:scale-110 transition-transform" style={{ marginLeft: '-4px' }}>
-                            +{tour.joinedUsers.length - 3}
+                            +{tour.participants.length - 3}
                           </div>
                         )}
                       </div>
                     </div>
                   )}
 
-                  <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors">
-                    Присоединиться
+                  <button 
+                    onClick={() => router.push(`/tours/${tour.id}`)}
+                    className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-2 px-3 rounded-2xl text-xs font-medium font-helvetica transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  >
+                    Подробнее
                   </button>
                 </div>
               </div>

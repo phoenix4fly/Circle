@@ -19,6 +19,39 @@ class TourCategory(models.Model):
         return self.name
 
 
+class Destination(models.Model):
+    """Направления туров (регионы, города, страны)"""
+    name = models.CharField(max_length=100, unique=True, help_text="Название направления")
+    description = models.TextField(blank=True, help_text="Описание направления")
+    region = models.CharField(
+        max_length=50,
+        choices=[
+            ('uzbekistan', 'Узбекистан'),
+            ('central_asia', 'Центральная Азия'),
+            ('asia', 'Азия'),
+            ('europe', 'Европа'),
+            ('other', 'Другое'),
+        ],
+        default='uzbekistan'
+    )
+    image = models.ImageField(
+        upload_to="destination_images/",
+        null=True,
+        blank=True,
+        help_text="Изображение направления"
+    )
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0, help_text="Порядок отображения")
+
+    class Meta:
+        verbose_name = "Destination"
+        verbose_name_plural = "Destinations"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
 class Tour(models.Model):
     title = models.CharField(max_length=200, help_text="Название тура")
     slug = models.SlugField(unique=True)
@@ -37,6 +70,7 @@ class Tour(models.Model):
         related_name="tours",
         help_text="Тип/категория тура"
     )
+
     price_from = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -59,10 +93,13 @@ class Tour(models.Model):
         blank=True,
         help_text='Варианты транспорта и цены. Пример: {"bus": 100000, "car": 150000}'
     )
-    main_image = models.ImageField(
-        upload_to="tour_main_images/",
+    main_image = models.ForeignKey(
+        Media,
+        on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name="tours_as_main_image",
+        help_text="Основное изображение тура"
     )
     gallery = models.ManyToManyField(
         Media,
@@ -280,7 +317,7 @@ class TourChat(models.Model):
 
     def __str__(self):
         return f"Chat for {self.tour.title}"
-    
+
 
 
 
