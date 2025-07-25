@@ -14,7 +14,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'circle-k7x9m@n2v5w8z#A$D%G*J-N4R6U9Y$b&E(H
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 
 # Application definition
 DJANGO_APPS = [

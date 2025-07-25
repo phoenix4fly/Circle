@@ -3,6 +3,7 @@
 import { Tour } from '@/lib/api';
 import Link from 'next/link';
 import { MapPinIcon, CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
+import WishlistButton from './WishlistButton';
 
 interface TourCardProps {
   tour: Tour;
@@ -25,6 +26,20 @@ const TourCard = ({ tour }: TourCardProps) => {
               <span className="text-white text-sm font-medium text-center px-2">📸 {tour.title.substring(0, 20)}</span>
             </div>
           )}
+          
+          {/* Wishlist Button */}
+          <div 
+            className="absolute top-2 left-2 z-10"
+            onClick={(e) => e.preventDefault()} // Предотвращаем переход по ссылке при клике на кнопку
+          >
+            <WishlistButton 
+              tourId={tour.id}
+              isWishlisted={tour.is_wishlisted || false}
+              size="small"
+            />
+          </div>
+          
+          {/* Цена */}
           <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-sm font-medium text-orange-600">
             {(Number(tour.price_from) / 1000).toFixed(0)}к сум
           </div>

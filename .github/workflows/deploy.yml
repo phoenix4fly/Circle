@@ -1,0 +1,333 @@
+name: 🚀 Deploy Circle to Production
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual trigger
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Testing jobs
+  test-backend:
+    name: 🧪 Test Backend
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_circle
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 📦 Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('circle-backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: 🔧 Install dependencies
+      working-directory: ./circle-backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: 🧪 Run tests
+      working-directory: ./circle-backend
+      env:
+        SECRET_KEY: test-secret-key
+        DEBUG: True
+        DB_ENGINE: django.db.backends.postgresql
+        DB_NAME: test_circle
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        DB_HOST: localhost
+        DB_PORT: 5432
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        python manage.py collectstatic --noinput
+        python manage.py migrate
+        python manage.py test
+
+  test-frontend:
+    name: 🧪 Test Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: circle-frontend/package-lock.json
+        
+    - name: 🔧 Install dependencies
+      working-directory: ./circle-frontend
+      run: npm ci
+      
+    - name: 🎯 Type check
+      working-directory: ./circle-frontend
+      run: npm run type-check
+      
+    - name: 🧪 Run tests (если есть)
+      working-directory: ./circle-frontend
+      run: |
+        # npm run test -- --passWithNoTests
+        echo "No tests configured yet"
+        
+    - name: 🏗️ Build application
+      working-directory: ./circle-frontend
+      env:
+        NODE_ENV: production
+        NEXT_PUBLIC_API_URL: https://api.example.com
+      run: npm run build
+
+  # Security scanning
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: 📊 Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Build and push Docker images
+  build-images:
+    name: 🏗️ Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    outputs:
+      backend-image: ${{ steps.meta-backend.outputs.tags }}
+      frontend-image: ${{ steps.meta-frontend.outputs.tags }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔐 Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 🔧 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    # Backend image
+    - name: 📝 Extract backend metadata
+      id: meta-backend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: 🏗️ Build and push backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./circle-backend
+        file: ./circle-backend/docker/backend.Dockerfile
+        push: true
+        tags: ${{ steps.meta-backend.outputs.tags }}
+        labels: ${{ steps.meta-backend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    # Frontend image
+    - name: 📝 Extract frontend metadata
+      id: meta-frontend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: 🏗️ Build and push frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./circle-frontend
+        file: ./circle-frontend/Dockerfile
+        push: true
+        tags: ${{ steps.meta-frontend.outputs.tags }}
+        labels: ${{ steps.meta-frontend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Deploy to production
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-images, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔐 Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: 🌍 Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        
+    - name: 📤 Copy deployment files
+      run: |
+        scp -r docker-compose.yml deploy.sh env.example ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/circle/
+        
+    - name: 🚀 Deploy to server
+      run: |
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          cd ~/circle
+          
+          # Backup current deployment
+          if [ -d "backup" ]; then rm -rf backup; fi
+          mkdir -p backup
+          docker-compose down
+          
+          # Update images in docker-compose.yml to use registry images
+          sed -i 's|build:|#build:|g' docker-compose.yml
+          sed -i 's|context: ./circle-backend|#context: ./circle-backend|g' docker-compose.yml
+          sed -i 's|dockerfile: docker/backend.Dockerfile|#dockerfile: docker/backend.Dockerfile|g' docker-compose.yml
+          sed -i 's|context: ./circle-frontend|#context: ./circle-frontend|g' docker-compose.yml
+          sed -i 's|dockerfile: Dockerfile|#dockerfile: Dockerfile|g' docker-compose.yml
+          
+          # Add image references
+          sed -i '/container_name: circle_backend/a\    image: ${{ needs.build-images.outputs.backend-image }}' docker-compose.yml
+          sed -i '/container_name: circle_frontend/a\    image: ${{ needs.build-images.outputs.frontend-image }}' docker-compose.yml
+          
+          # Pull new images
+          docker pull ${{ needs.build-images.outputs.backend-image }}
+          docker pull ${{ needs.build-images.outputs.frontend-image }}
+          
+          # Deploy
+          ./deploy.sh deploy
+          
+          # Health check
+          sleep 30
+          ./deploy.sh status
+        EOF
+        
+    - name: 🔍 Verify deployment
+      run: |
+        # Wait for services to be ready
+        sleep 60
+        
+        # Health checks
+        curl -f http://${{ secrets.SERVER_HOST }}/api/health/ || exit 1
+        curl -f http://${{ secrets.SERVER_HOST }}/health/ || exit 1
+        
+    - name: 📱 Send deployment notification
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: |
+          🚀 Deployment to production ${{ job.status }}!
+          
+          📊 Summary:
+          • Backend tests: ${{ needs.test-backend.result }}
+          • Frontend tests: ${{ needs.test-frontend.result }}
+          • Security scan: ${{ needs.security-scan.result }}
+          • Image build: ${{ needs.build-images.result }}
+          • Deployment: ${{ job.status }}
+          
+          🌐 Application: https://circles.uz
+          📝 Commit: ${{ github.event.head_commit.message }}
+          👤 Author: ${{ github.actor }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Cleanup old images
+  cleanup:
+    name: 🧹 Cleanup Old Images
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 🔐 Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 🧹 Delete old container images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: '${{ env.IMAGE_NAME }}-backend'
+        package-type: 'container'
+        min-versions-to-keep: 5
+        delete-only-untagged-versions: true
+        
+    - name: 🧹 Delete old frontend images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: '${{ env.IMAGE_NAME }}-frontend'
+        package-type: 'container'
+        min-versions-to-keep: 5
+        delete-only-untagged-versions: true 

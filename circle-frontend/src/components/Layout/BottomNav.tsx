@@ -7,7 +7,7 @@ import {
   HomeIcon, 
   MagnifyingGlassIcon, 
   ChatBubbleLeftRightIcon, 
-  UserIcon
+  UserIcon 
 } from '@heroicons/react/24/outline';
 
 export default function BottomNav() {

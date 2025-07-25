@@ -6,6 +6,7 @@ from .models import (
     TourSchedule,
     TourSession,
     TourParameterValue,
+    TourWishlist,
 )
 from apps.media.models import Media
 from apps.media.serializers import MediaSerializer
@@ -162,6 +163,7 @@ class TourListSerializer(serializers.ModelSerializer):
     category = TourCategorySerializer(source='type', read_only=True)
     main_image = MediaSerializer(read_only=True)
     participants = serializers.SerializerMethodField()
+    is_wishlisted = serializers.SerializerMethodField()
     
     class Meta:
         model = Tour
@@ -174,6 +176,7 @@ class TourListSerializer(serializers.ModelSerializer):
             'duration_days',
             'main_image',
             'participants',
+            'is_wishlisted',
             'is_active'
         ]
     
@@ -187,6 +190,13 @@ class TourListSerializer(serializers.ModelSerializer):
         
         users = [booking.user for booking in bookings]
         return TourParticipantNewSerializer(users, many=True, context=self.context).data
+    
+    def get_is_wishlisted(self, obj):
+        """Проверяет находится ли тур в wishlist текущего пользователя"""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return TourWishlist.is_in_wishlist(request.user, obj)
 
 
 ########################################
@@ -200,6 +210,7 @@ class TourDetailSerializer(serializers.ModelSerializer):
     sessions = TourSessionSerializer(many=True, read_only=True)
     parameter_values = TourParameterValueSerializer(many=True, read_only=True)
     participants = serializers.SerializerMethodField()
+    is_wishlisted = serializers.SerializerMethodField()
 
     class Meta:
         model = Tour
@@ -221,6 +232,7 @@ class TourDetailSerializer(serializers.ModelSerializer):
             'sessions',
             'parameter_values',
             'participants',
+            'is_wishlisted',
             'is_active'
         ]
     
@@ -234,4 +246,11 @@ class TourDetailSerializer(serializers.ModelSerializer):
         
         users = [booking.user for booking in bookings]
         return TourParticipantNewSerializer(users, many=True, context=self.context).data
+    
+    def get_is_wishlisted(self, obj):
+        """Проверяет находится ли тур в wishlist текущего пользователя"""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return TourWishlist.is_in_wishlist(request.user, obj)
 

@@ -6,7 +6,8 @@ from .models import (
     TourParameterDefinition,
     TourParameterValue,
     TourChat,
-    TourSession
+    TourSession,
+    TourWishlist
 )
 from .models import Promotion, PromoCode
 
@@ -191,3 +192,41 @@ class PromoCodeAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
+
+
+@admin.register(TourWishlist)
+class TourWishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'tour', 'priority', 'added_at')
+    list_filter = ('priority', 'added_at', 'tour__agency', 'tour__type')
+    search_fields = ('user__first_name', 'user__last_name', 'user__username', 'tour__title')
+    autocomplete_fields = ['user', 'tour']
+    readonly_fields = ('added_at',)
+    
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'tour', 'priority')
+        }),
+        ('Details', {
+            'fields': ('notes', 'added_at')
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'tour', 'tour__agency')
+    
+    actions = ['set_high_priority', 'set_medium_priority', 'set_low_priority']
+    
+    def set_high_priority(self, request, queryset):
+        updated = queryset.update(priority=1)
+        self.message_user(request, f'{updated} записей помечены как высокий приоритет.')
+    set_high_priority.short_description = "Установить высокий приоритет"
+    
+    def set_medium_priority(self, request, queryset):
+        updated = queryset.update(priority=2)
+        self.message_user(request, f'{updated} записей помечены как средний приоритет.')
+    set_medium_priority.short_description = "Установить средний приоритет"
+    
+    def set_low_priority(self, request, queryset):
+        updated = queryset.update(priority=3)
+        self.message_user(request, f'{updated} записей помечены как низкий приоритет.')
+    set_low_priority.short_description = "Установить низкий приоритет"

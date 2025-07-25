@@ -372,6 +372,7 @@ export interface Tour {
   duration_nights?: number;
   distance_from_tashkent_km?: number;
   transport_options?: string;
+  is_wishlisted?: boolean;
   main_image?: {
     id: number;
     url: string;
@@ -461,6 +462,58 @@ export const toursApi = {
       throw new ApiError('Tour not found', 404);
     }
     return tour;
+  }
+};
+
+// Типы для wishlist
+export interface WishlistItem {
+  id: number;
+  tour: Tour;
+  added_at: string;
+  priority: 1 | 2 | 3;
+  notes: string;
+  wishlist_meta?: {
+    added_at: string;
+    priority: number;
+    notes: string;
+  };
+}
+
+export interface WishlistResponse {
+  count: number;
+  results: Tour[];
+}
+
+export interface WishlistToggleResponse {
+  message: string;
+  is_wishlisted: boolean;
+}
+
+// API для работы с wishlist
+export const wishlistApi = {
+  // Добавить/убрать тур из планов
+  async toggleWishlist(tourId: number): Promise<WishlistToggleResponse> {
+    return httpClient.post(`/tours/tours/${tourId}/wishlist/`, {});
+  },
+
+  // Убрать тур из планов
+  async removeFromWishlist(tourId: number): Promise<WishlistToggleResponse> {
+    return httpClient.delete(`/tours/tours/${tourId}/wishlist/`);
+  },
+
+  // Получить список запланированных туров
+  async getWishlist(): Promise<WishlistResponse> {
+    return httpClient.get('/tours/wishlist/');
+  },
+
+  // Обновить приоритет запланированного тура
+  async updateWishlistItem(itemId: number, data: { priority?: number; notes?: string }): Promise<WishlistItem> {
+    return httpClient.patch(`/tours/wishlist/${itemId}/`, data);
+  },
+
+  // Очистить все запланированные туры
+  async clearWishlist(): Promise<{ message: string; deleted_count: number }> {
+    return httpClient.delete('/tours/wishlist/clear/');
   }
 };
 

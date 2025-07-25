@@ -1,0 +1,264 @@
+version: '3.8'
+
+services:
+  # Database
+  db:
+    image: postgres:15-alpine
+    container_name: circle_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - circle_network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: circle_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - circle_network
+
+  # Backend
+  backend:
+    build:
+      context: ./circle-backend
+      dockerfile: docker/backend.Dockerfile
+    container_name: circle_backend
+    restart: unless-stopped
+    environment:
+      # Django settings
+      DEBUG: 'False'
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      
+      # Database
+      DB_ENGINE: 'django.db.backends.postgresql'
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 5432
+      
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
+      # Celery
+      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/1
+      
+      # Services
+      WAIT_FOR_DB: 'true'
+      WAIT_FOR_REDIS: 'true'
+      LOAD_INITIAL_DATA: ${LOAD_INITIAL_DATA:-false}
+      
+      # Superuser
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+      
+      # External APIs
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL}
+      
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+      - logs_volume:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - circle_network
+
+  # Celery Worker
+  worker:
+    build:
+      context: ./circle-backend
+      dockerfile: docker/worker.Dockerfile
+    container_name: circle_worker
+    restart: unless-stopped
+    environment:
+      # Django settings
+      DEBUG: 'False'
+      SECRET_KEY: ${SECRET_KEY}
+      
+      # Database
+      DB_ENGINE: 'django.db.backends.postgresql'
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 5432
+      
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
+      # Celery
+      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/1
+      
+      # Services
+      WAIT_FOR_DB: 'true'
+      WAIT_FOR_REDIS: 'true'
+      
+    volumes:
+      - logs_volume:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - circle_network
+
+  # Celery Beat (scheduler)
+  beat:
+    build:
+      context: ./circle-backend
+      dockerfile: docker/worker.Dockerfile
+    container_name: circle_beat
+    restart: unless-stopped
+    command: ["celery", "-A", "circle", "beat", "--loglevel=info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler"]
+    environment:
+      # Django settings
+      DEBUG: 'False'
+      SECRET_KEY: ${SECRET_KEY}
+      
+      # Database
+      DB_ENGINE: 'django.db.backends.postgresql'
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 5432
+      
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
+      # Celery
+      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/1
+      
+      # Services
+      WAIT_FOR_DB: 'true'
+      WAIT_FOR_REDIS: 'true'
+      
+    volumes:
+      - logs_volume:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - circle_network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./circle-frontend
+      dockerfile: Dockerfile
+    container_name: circle_frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_TELEGRAM_BOT_NAME: ${NEXT_PUBLIC_TELEGRAM_BOT_NAME}
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - circle_network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: circle_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./circle-backend/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/app/static:ro
+      - media_volume:/app/media:ro
+      - ./ssl:/etc/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - circle_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+  logs_volume:
+    driver: local
+
+networks:
+  circle_network:
+    driver: bridge 

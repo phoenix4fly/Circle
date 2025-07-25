@@ -317,7 +317,7 @@ class TourChat(models.Model):
 
     def __str__(self):
         return f"Chat for {self.tour.title}"
-
+    
 
 
 
@@ -420,3 +420,69 @@ class PromoCode(models.Model):
         if self.discount_amount:
             discount += self.discount_amount
         return min(discount, base_price)
+
+
+class TourWishlist(models.Model):
+    """Запланированные туры пользователя (wishlist)"""
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='wishlisted_tours',
+        verbose_name="Пользователь"
+    )
+    tour = models.ForeignKey(
+        'Tour', 
+        on_delete=models.CASCADE,
+        related_name='wishlist_entries',
+        verbose_name="Тур"
+    )
+    added_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата добавления"
+    )
+    priority = models.IntegerField(
+        choices=[
+            (1, 'Высокий'),
+            (2, 'Средний'), 
+            (3, 'Низкий'),
+        ],
+        default=2,
+        verbose_name="Приоритет"
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name="Личные заметки",
+        help_text="Заметки пользователя о туре"
+    )
+    
+    class Meta:
+        unique_together = ('user', 'tour')
+        verbose_name = 'Запланированный тур'
+        verbose_name_plural = 'Запланированные туры'
+        ordering = ['-added_at']
+
+    def __str__(self):
+        return f"{self.user.first_name} → {self.tour.title}"
+
+    @classmethod
+    def toggle_wishlist(cls, user, tour):
+        """Переключает тур в/из wishlist. Возвращает (объект, создан_ли_новый)"""
+        wishlist_item, created = cls.objects.get_or_create(
+            user=user,
+            tour=tour,
+            defaults={'priority': 2}
+        )
+        
+        if not created:
+            # Если уже был в wishlist - удаляем
+            wishlist_item.delete()
+            return None, False
+        
+        return wishlist_item, True
+
+    @classmethod
+    def is_in_wishlist(cls, user, tour):
+        """Проверяет находится ли тур в wishlist пользователя"""
+        if not user or not user.is_authenticated:
+            return False
+        return cls.objects.filter(user=user, tour=tour).exists()

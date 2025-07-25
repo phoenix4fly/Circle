@@ -20,3 +20,4 @@ python-dotenv
 # Для удобства при разработке
 django-debug-toolbar
 
+gunicorn==21.2.0

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Tour, toursApi } from '@/lib/api';
 import { useTelegramAuth } from '@/hooks/useTelegramAuth';
+import WishlistButton from '@/components/Tour/WishlistButton';
 
 const TourDetailPage = () => {
   const { id } = useParams();
@@ -417,6 +418,28 @@ const TourDetailPage = () => {
                     </button>
                   </div>
                 )}
+
+                {/* Секция "Добавить в планы" */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-4 border border-red-100">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 font-helvetica">
+                        Хочу поехать!
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-4 font-helvetica">
+                        Сохраните тур в планы, чтобы не потерять. Мы уведомим о скидках и новых датах!
+                      </p>
+                      
+                      <WishlistButton
+                        tourId={tour.id}
+                        isWishlisted={tour.is_wishlisted || false}
+                        size="large"
+                        showText={true}
+                        className="shadow-md hover:shadow-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="flex items-center space-x-2 text-xs text-gray-600 mb-2 font-helvetica">

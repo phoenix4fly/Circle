@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { MapPinIcon, CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
+import WishlistButton from './WishlistButton';
 
 interface TourParticipant {
   id: number;
@@ -19,6 +20,7 @@ interface TourCardProps {
     title: string;
     price_from: string;
     duration_days: number;
+    is_wishlisted?: boolean;
     category?: {
       name: string;
     };
@@ -55,6 +57,20 @@ export default function TourCardMain({ tour, showButton = true, onParticipantsCl
             <span className="text-white text-xs font-medium text-center px-2">📸 {tour.title.substring(0, 20)}</span>
           </div>
         )}
+        
+        {/* Wishlist Button */}
+        <div 
+          className="absolute top-2 left-2 z-10"
+          onClick={(e) => e.preventDefault()} // Предотвращаем переход при клике на кнопку
+        >
+          <WishlistButton 
+            tourId={tour.id}
+            isWishlisted={tour.is_wishlisted || false}
+            size="small"
+          />
+        </div>
+        
+        {/* Цена */}
         <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-medium text-orange-600">
           {(Number(tour.price_from) / 1000).toFixed(0)}к сум
         </div>

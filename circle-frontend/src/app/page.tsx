@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UserIcon, BellIcon, MapPinIcon, CalendarIcon, UsersIcon, HomeIcon, MagnifyingGlassIcon, ChatBubbleLeftRightIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useTelegramAuth } from '@/hooks/useTelegramAuth';
 import { Tour as ApiTour, toursApi } from '@/lib/api';
+import WishlistButton from '@/components/Tour/WishlistButton';
 
 // Моковые данные для туров с участниками
 const mockTours = [
@@ -425,6 +426,21 @@ export default function HomePage() {
                       <span className="text-white text-xs font-medium text-center px-2">📸 {tour.title.substring(0, 20)}</span>
                     </div>
                   )}
+                  
+                  {/* Wishlist Button с текстом */}
+                  <div 
+                    className="absolute top-2 left-2 z-10"
+                    onClick={(e) => e.preventDefault()} // Предотвращаем переход по ссылке
+                  >
+                    <WishlistButton 
+                      tourId={tour.id}
+                      isWishlisted={tour.is_wishlisted || false}
+                      size="small"
+                      showText={true}
+                    />
+                  </div>
+                  
+                  {/* Цена */}
                   <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-medium text-orange-600">
                     {(Number(tour.price_from) / 1000).toFixed(0)}к
                   </div>

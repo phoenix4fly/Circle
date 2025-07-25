@@ -18,7 +18,7 @@
         "car": 80000,
         "minivan": 120000
       },
-      "main_image": "",
+      "main_image": null,
       "is_active": true,
       "season_start": "2024-04-01",
       "season_end": "2024-10-31",
@@ -45,7 +45,7 @@
         "bus": 120000,
         "car": 250000
       },
-      "main_image": "",
+      "main_image": null,
       "is_active": true,
       "season_start": null,
       "season_end": null,
@@ -71,7 +71,7 @@
         "suv": 200000,
         "minivan": 150000
       },
-      "main_image": "",
+      "main_image": null,
       "is_active": true,
       "season_start": "2024-03-15",
       "season_end": "2024-11-15",
@@ -97,7 +97,7 @@
         "train": 160000,
         "bus": 100000
       },
-      "main_image": "",
+      "main_image": 3,
       "is_active": true,
       "season_start": null,
       "season_end": null,
@@ -123,7 +123,7 @@
         "suv": 120000,
         "minivan": 100000
       },
-      "main_image": "",
+      "main_image": null,
       "is_active": true,
       "season_start": "2024-05-01",
       "season_end": "2024-09-30",
@@ -329,6 +329,59 @@
       "tour": 5,
       "parameter_definition": 4,
       "value": "32.0"
+    }
+  },
+  {
+    "model": "tours.tour",
+    "pk": 6,
+    "fields": {
+      "title": "Открой для себя Алматы",
+      "slug": "almaty-city-tour",
+      "agency": 1,
+      "description": "Исследуйте культурную столицу Казахстана! Посетите парк Кок-Тобе, Зеленый базар, площадь Республики и насладитесь потрясающими видами на горы Заилийского Алатау.",
+      "type": 3,
+      "price_from": 550000,
+      "base_price": 550000,
+      "distance_from_tashkent_km": 1050,
+      "duration_days": 3,
+      "duration_nights": 2,
+      "transport_options": {
+        "plane": 400000,
+        "bus": 200000
+      },
+      "main_image": 2,
+      "is_active": true,
+      "season_start": null,
+      "season_end": null,
+      "created_at": "2024-12-25T18:00:00Z",
+      "updated_at": "2024-12-25T18:00:00Z"
+    }
+  },
+  {
+    "model": "tours.tour",
+    "pk": 7,
+    "fields": {
+      "title": "Древняя Хива - музей под открытым небом",
+      "slug": "khiva-heritage-tour",
+      "agency": 2,
+      "description": "Прогулка по средневековой Хиве - городу-музею с уникальной архитектурой. Исследуйте Ичан-Калу, минарет Кальта-Минор и дворец Таш-Хаули в этом объекте всемирного наследия ЮНЕСКО.",
+      "type": 3,
+      "price_from": 380000,
+      "base_price": 380000,
+      "distance_from_tashkent_km": 450,
+      "duration_days": 2,
+      "duration_nights": 1,
+      "transport_options": {
+        "plane": 300000,
+        "bus": 150000,
+        "car": 200000
+      },
+      "main_image": 4,
+      "is_active": true,
+      "season_start": null,
+      "season_end": null,
+      "created_at": "2024-12-25T18:00:00Z",
+      "updated_at": "2024-12-25T18:00:00Z"
     }
   }
 ] 
