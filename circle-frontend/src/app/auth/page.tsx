@@ -95,13 +95,22 @@ export default function AuthPage() {
         throw new Error('Пароль обязателен для DEV авторизации!');
       }
       
+      // Очищаем логин от пробелов и лишних символов
+      let cleanLogin = loginForm.phoneOrEmail.trim();
+      
+      // Если телефон, убираем все кроме + и цифр
+      if (cleanLogin.startsWith('+')) {
+        cleanLogin = cleanLogin.replace(/[^\+\d]/g, '');
+      }
+      
       const loginData: LoginData = {
-        login: loginForm.phoneOrEmail,
+        login: cleanLogin, // <- БЕЗ ПРОБЕЛОВ!
         password: loginForm.password
       };
 
       console.log('📤 Отправляемые данные:', {
-        login: loginData.login,
+        original: loginForm.phoneOrEmail,
+        cleaned: cleanLogin,
         passwordLength: loginData.password.length,
         hasPassword: !!loginData.password
       });
@@ -342,18 +351,18 @@ export default function AuthPage() {
                       </div>
                     )}
                     
-                    {/* Поле телефона или email */}
+                    {/* Поле логина */}
                     <div className="mb-4">
                       <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-                        Телефон или Email
+                        Логин
                       </label>
                       <div className="relative">
-                        <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                        <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <input
                           type="text"
                           value={loginForm.phoneOrEmail}
                           onChange={(e) => setLoginForm({ ...loginForm, phoneOrEmail: e.target.value })}
-                          placeholder="+998 XX XXX XX XX или email@example.com"
+                          placeholder="Введите username или телефон"
                           className="w-full pl-9 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
                           required
                         />

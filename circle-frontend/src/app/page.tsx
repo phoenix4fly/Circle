@@ -122,12 +122,12 @@ const promotionalBanners = [
 
 // Турагентства
 const travelAgencies = [
-  { id: 1, name: "Vezdekhodi", logo: "http://127.0.0.1:8001/media/agency_logos/vezdekhodi.png", rating: 5.0, tours: 95 },
-  { id: 2, name: "Travel Nation", logo: "http://127.0.0.1:8001/media/agency_logos/travelnation.jpg", rating: 4.9, tours: 62 },
-  { id: 3, name: "Wolf Travel", logo: "http://127.0.0.1:8001/media/agency_logos/wolftravel.png", rating: 4.7, tours: 38 },
-  { id: 4, name: "Go Travel", logo: "http://127.0.0.1:8001/media/agency_logos/gotravel.png", rating: 4.6, tours: 51 },
-  { id: 5, name: "Tracker", logo: "http://127.0.0.1:8001/media/agency_logos/tracker.jpg", rating: 4.8, tours: 29 },
-  { id: 6, name: "Poehali", logo: "http://127.0.0.1:8001/media/agency_logos/poehali.jpg", rating: 4.9, tours: 73 }
+  { id: 1, name: "Vezdekhodi", logo: "https://circles.uz/media/agency_logos/vezdekhodi.png", rating: 5.0, tours: 95 },
+  { id: 2, name: "Travel Nation", logo: "https://circles.uz/media/agency_logos/travelnation.jpg", rating: 4.9, tours: 62 },
+  { id: 3, name: "Wolf Travel", logo: "https://circles.uz/media/agency_logos/wolftravel.png", rating: 4.7, tours: 38 },
+  { id: 4, name: "Go Travel", logo: "https://circles.uz/media/agency_logos/gotravel.png", rating: 4.6, tours: 51 },
+  { id: 5, name: "Tracker", logo: "https://circles.uz/media/agency_logos/tracker.jpg", rating: 4.8, tours: 29 },
+  { id: 6, name: "Poehali", logo: "https://circles.uz/media/agency_logos/poehali.jpg", rating: 4.9, tours: 73 }
 ];
 
 // Типы

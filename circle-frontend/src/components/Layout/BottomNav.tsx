@@ -14,10 +14,10 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { icon: HomeIcon, label: 'Главная', href: '/' },
-    { icon: MagnifyingGlassIcon, label: 'Поиск', href: '/tours' },
-    { icon: ChatBubbleLeftRightIcon, label: 'Чаты', href: '/chats' },
-    { icon: UserIcon, label: 'Профиль', href: '/profile' },
+    { icon: HomeIcon, label: 'Главная', href: '/', clickable: true },
+    { icon: MagnifyingGlassIcon, label: 'Поиск', href: '/tours', clickable: true },
+    { icon: ChatBubbleLeftRightIcon, label: 'Чаты', href: '/chats', clickable: false },
+    { icon: UserIcon, label: 'Профиль', href: '/profile', clickable: true },
   ];
 
   return (
@@ -26,6 +26,19 @@ export default function BottomNav() {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || (item.href === '/tours' && pathname.startsWith('/tours'));
+          
+          // Если кнопка не кликабельная, рендерим div вместо Link
+          if (!item.clickable) {
+            return (
+              <div
+                key={item.href}
+                className="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 font-helvetica text-gray-300 cursor-not-allowed"
+              >
+                <Icon className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </div>
+            );
+          }
           
           return (
             <Link
