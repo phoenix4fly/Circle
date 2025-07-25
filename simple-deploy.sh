@@ -160,9 +160,9 @@ EOF
         source $VENV_DIR/bin/activate
         pm2 start "gunicorn --bind 127.0.0.1:8000 --workers 4 circle.wsgi:application" --name circle-backend
         
-        # Start frontend with PM2
+        # Start frontend with PM2 (standalone mode)
         cd $FRONTEND_DIR
-        pm2 start npm --name circle-frontend -- start
+        pm2 start node --name circle-frontend -- .next/standalone/server.js
         
         # Start Celery worker
         cd $BACKEND_DIR

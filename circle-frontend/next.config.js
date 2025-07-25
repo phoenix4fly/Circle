@@ -1,14 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Настройки для Telegram WebApp
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/webapp' : '',
+  // Убираем assetPrefix - он ломает деплой
+  // assetPrefix: process.env.NODE_ENV === 'production' ? '/webapp' : '',
   trailingSlash: true,
   
   // Базовые оптимизации
   poweredByHeader: false,
   compress: true,
   
-  // Standalone mode для Docker
+  // Standalone mode для production
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   
   // Оптимизация изображений
